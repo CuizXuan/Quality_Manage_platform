@@ -1,13 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import proxy
+from app.database import init_db
+from app.routers import cases, environments, scenarios, logs, folders, proxy
 
-app = FastAPI(title="API Debug Tool Backend")
+app = FastAPI(title="Quality Manage Platform - API Debug Tool")
 
-# CORS 配置 - 允许前端本地调用
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 开发环境允许所有，生产环境应限制为具体域名
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -15,8 +15,23 @@ app.add_middleware(
 
 # 注册路由
 app.include_router(proxy.router, prefix="/proxy", tags=["Proxy"])
+app.include_router(cases.router)
+app.include_router(environments.router)
+app.include_router(scenarios.router)
+app.include_router(logs.router)
+app.include_router(folders.router)
+
+
+@app.on_event("startup")
+def on_startup():
+    init_db()
+
+
+@app.get("/api/health")
+def health():
+    return {"status": "ok"}
 
 
 @app.get("/")
 async def root():
-    return {"message": "API Debug Tool Backend", "version": "1.0.0"}
+    return {"message": "Quality Manage Platform API", "version": "1.0.0"}
