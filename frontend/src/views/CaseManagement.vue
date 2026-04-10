@@ -2,40 +2,66 @@
   <div class="case-management">
     <!-- 顶部工具栏 -->
     <div class="toolbar">
-      <input v-model="keyword" placeholder="搜索用例..." class="search-input" @input="debounceSearch" />
-      <button class="btn primary" @click="showCreateModal = true">+ 新建用例</button>
+      <div class="toolbar-left">
+        <h2 class="page-title">
+          <span class="prompt">&gt;</span> CASE MANAGEMENT
+        </h2>
+      </div>
+      <div class="toolbar-right">
+        <input v-model="keyword" placeholder="SEARCH_CASES..." class="search-input" @input="debounceSearch" />
+        <button class="btn primary" @click="showCreateModal = true">
+          <span>+</span> NEW CASE
+        </button>
+      </div>
     </div>
 
     <!-- 文件夹树 + 用例列表 -->
     <div class="content">
       <!-- 左侧文件夹树 -->
-      <div class="folder-tree">
-        <div class="tree-item root" :class="{ active: selectedFolder === '/' }" @click="selectFolder('/')">
-          全部用例 ({{ cases.length }})
+      <div class="folder-tree panel">
+        <div class="panel-header">
+          <span class="panel-title">// COLLECTIONS</span>
+        </div>
+        <div
+          class="tree-item root"
+          :class="{ active: selectedFolder === '/' }"
+          @click="selectFolder('/')"
+        >
+          <span class="folder-icon">◈</span>
+          ALL CASES ({{ cases.length }})
         </div>
         <div v-for="folder in folderList" :key="folder.path"
-          class="tree-item" :class="{ active: selectedFolder === folder.path }"
-          @click="selectFolder(folder.path)">
-          📁 {{ folder.name }} ({{ folder.count }})
+          class="tree-item"
+          :class="{ active: selectedFolder === folder.path }"
+          @click="selectFolder(folder.path)"
+        >
+          <span class="folder-icon">▤</span>
+          {{ folder.name }} ({{ folder.count }})
         </div>
       </div>
 
       <!-- 用例列表 -->
-      <div class="case-list">
-        <div v-if="loading" class="loading">加载中...</div>
+      <div class="case-list panel">
+        <div class="panel-header">
+          <span class="panel-title">// CASE LIST</span>
+        </div>
+        <div v-if="loading" class="loading">
+          <span class="loading-spinner">⟳</span>
+          <span>LOADING...</span>
+        </div>
         <div v-else-if="filteredCases.length === 0" class="empty">
-          {{ keyword ? '没有找到匹配的用例' : '暂无用例，点击"新建用例"开始' }}
+          <span class="glitch">// NO DATA FOUND</span>
         </div>
         <div v-else class="case-table">
           <div class="table-header">
-            <span class="col-method">方法</span>
-            <span class="col-name">名称</span>
-            <span class="col-path">路径</span>
-            <span class="col-actions">操作</span>
+            <span class="col-method">METHOD</span>
+            <span class="col-name">NAME</span>
+            <span class="col-path">PATH</span>
+            <span class="col-actions">ACTIONS</span>
           </div>
           <div v-for="c in filteredCases" :key="c.id" class="table-row" @click="openCase(c)">
             <span class="col-method">
-              <span :class="`method-badge method-${c.method.toLowerCase()}`">{{ c.method }}</span>
+              <span class="method-badge" :class="'method-' + c.method.toLowerCase()">{{ c.method }}</span>
             </span>
             <span class="col-name">{{ c.name }}</span>
             <span class="col-path">{{ c.folder_path }}</span>
@@ -52,34 +78,39 @@
     <!-- 新建/编辑弹窗 -->
     <div v-if="showCreateModal" class="modal-overlay" @click.self="showCreateModal = false">
       <div class="modal">
-        <h3>{{ editingCase ? '编辑用例' : '新建用例' }}</h3>
-        <div class="form-group">
-          <label>名称</label>
-          <input v-model="form.name" placeholder="用例名称" />
+        <div class="modal-header">
+          <h3>{{ editingCase ? '// EDIT CASE' : '// NEW CASE' }}</h3>
+          <button class="btn-close" @click="showCreateModal = false">×</button>
         </div>
-        <div class="form-row">
+        <div class="form-body">
           <div class="form-group">
-            <label>方法</label>
-            <select v-model="form.method">
-              <option v-for="m in ['GET','POST','PUT','DELETE','PATCH']" :key="m" :value="m">{{ m }}</option>
-            </select>
+            <label>NAME</label>
+            <input v-model="form.name" placeholder="用例名称" />
           </div>
-          <div class="form-group flex-1">
-            <label>URL</label>
-            <input v-model="form.url" placeholder="https://api.example.com/path" />
+          <div class="form-row">
+            <div class="form-group">
+              <label>METHOD</label>
+              <select v-model="form.method">
+                <option v-for="m in ['GET','POST','PUT','DELETE','PATCH']" :key="m" :value="m">{{ m }}</option>
+              </select>
+            </div>
+            <div class="form-group flex-1">
+              <label>URL</label>
+              <input v-model="form.url" placeholder="https://api.example.com/path" />
+            </div>
           </div>
-        </div>
-        <div class="form-group">
-          <label>文件夹路径</label>
-          <input v-model="form.folder_path" placeholder="/用户模块/登录" />
-        </div>
-        <div class="form-group">
-          <label>描述</label>
-          <textarea v-model="form.description" rows="2" placeholder="用例描述..."></textarea>
+          <div class="form-group">
+            <label>FOLDER_PATH</label>
+            <input v-model="form.folder_path" placeholder="/用户模块/登录" />
+          </div>
+          <div class="form-group">
+            <label>DESCRIPTION</label>
+            <textarea v-model="form.description" rows="2" placeholder="用例描述..."></textarea>
+          </div>
         </div>
         <div class="form-actions">
-          <button class="btn" @click="showCreateModal = false">取消</button>
-          <button class="btn primary" @click="saveCase">{{ editingCase ? '保存' : '创建' }}</button>
+          <button class="btn" @click="showCreateModal = false">CANCEL</button>
+          <button class="btn primary" @click="saveCase">{{ editingCase ? 'SAVE' : 'CREATE' }}</button>
         </div>
       </div>
     </div>
@@ -100,11 +131,12 @@ const showCreateModal = ref(false)
 const editingCase = ref(null)
 const form = ref(defaultForm())
 
-const { cases, folders, loading } = caseStore
+const cases = caseStore.cases
+const loading = computed(() => caseStore.loading)
 
 const folderList = computed(() => {
   const map = {}
-  cases.value.forEach(c => {
+  cases.forEach(c => {
     const path = c.folder_path || '/'
     if (path !== '/') {
       const name = path.split('/').filter(Boolean)[0] || ''
@@ -118,7 +150,7 @@ const folderList = computed(() => {
 })
 
 const filteredCases = computed(() => {
-  let list = cases.value
+  let list = cases
   if (selectedFolder.value !== '/') {
     list = list.filter(c => c.folder_path === selectedFolder.value)
   }
@@ -201,41 +233,316 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.case-management { height: 100%; display: flex; flex-direction: column; padding: 16px; gap: 12px; }
-.toolbar { display: flex; gap: 12px; align-items: center; }
-.search-input { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-secondary); color: var(--text); }
-.btn { padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text); cursor: pointer; }
-.btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
-.content { flex: 1; display: flex; gap: 16px; overflow: hidden; }
-.folder-tree { width: 200px; flex-shrink: 0; overflow-y: auto; }
-.tree-item { padding: 8px 12px; cursor: pointer; border-radius: 6px; font-size: 13px; }
-.tree-item:hover, .tree-item.active { background: var(--bg-secondary); }
-.case-list { flex: 1; overflow-y: auto; }
-.loading, .empty { padding: 40px; text-align: center; color: var(--text-secondary); }
-.case-table { display: table; width: 100%; }
-.table-header, .table-row { display: flex; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--border); }
-.table-header { font-weight: 600; font-size: 12px; color: var(--text-secondary); }
-.table-row { cursor: pointer; font-size: 13px; }
-.table-row:hover { background: var(--bg-secondary); }
-.col-method { width: 80px; }
+.case-management {
+  height: calc(100vh - var(--header-height) - 28px - 32px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.toolbar-left, .toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.page-title {
+  font-family: var(--font-title);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--neon-cyan);
+  margin: 0;
+  text-shadow: 0 0 10px var(--neon-cyan);
+}
+
+.prompt {
+  color: var(--neon-magenta);
+}
+
+.search-input {
+  padding: 8px 16px;
+  width: 250px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 1px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  color: var(--neon-cyan);
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.folder-tree {
+  width: 240px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-header {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-default);
+  background: rgba(0, 255, 255, 0.02);
+}
+
+.panel-title {
+  font-family: var(--font-title);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--text-secondary);
+}
+
+.tree-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-family: var(--font-title);
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  border-left: 2px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.tree-item:hover, .tree-item.active {
+  background: rgba(0, 255, 255, 0.05);
+  border-left-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+}
+
+.tree-item.active {
+  background: rgba(0, 255, 255, 0.1);
+}
+
+.folder-icon {
+  font-size: 12px;
+}
+
+.case-list {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.case-list .panel-header {
+  flex-shrink: 0;
+}
+
+.case-table {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.loading, .empty {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.loading-spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  margin-right: 10px;
+  color: var(--neon-cyan);
+}
+
+.glitch {
+  animation: glitch 0.5s infinite;
+}
+
+.table-header, .table-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.table-header {
+  font-family: var(--font-title);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--neon-cyan);
+  background: rgba(0, 255, 255, 0.02);
+  position: sticky;
+  top: 0;
+}
+
+.table-row {
+  cursor: pointer;
+  font-size: 12px;
+  transition: all var(--transition-fast);
+}
+
+.table-row:hover {
+  background: rgba(0, 255, 255, 0.05);
+}
+
+.col-method { width: 90px; }
 .col-name { flex: 1; }
-.col-path { width: 160px; color: var(--text-secondary); font-size: 12px; }
+.col-path { width: 160px; color: var(--text-secondary); font-size: 11px; }
 .col-actions { width: 120px; display: flex; gap: 4px; }
-.method-badge { padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; }
-.method-get { background: #61affe22; color: #61affe; }
-.method-post { background: #49cc9022; color: #49cc90; }
-.method-put { background: #fca13022; color: #fca130; }
-.method-delete { background: #f93e3e22; color: #f93e3e; }
-.method-patch { background: #50e3c222; color: #50e3c2; }
-.icon-btn { background: none; border: none; cursor: pointer; padding: 4px; font-size: 14px; }
-.icon-btn.danger:hover { color: #f93e3e; }
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; }
-.modal { background: var(--bg); border-radius: 12px; padding: 24px; width: 560px; max-height: 80vh; overflow-y: auto; }
-.modal h3 { margin: 0 0 20px; }
-.form-group { margin-bottom: 12px; }
-.form-group label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
-.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-secondary); color: var(--text); box-sizing: border-box; }
-.form-row { display: flex; gap: 12px; }
-.flex-1 { flex: 1; }
-.form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+
+.icon-btn {
+  background: transparent;
+  border: 1px solid var(--border-default);
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.icon-btn:hover {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+}
+
+.icon-btn.danger:hover {
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: var(--bg-panel);
+  border: 1px solid var(--neon-cyan);
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.3), inset 0 0 60px rgba(0, 255, 255, 0.05);
+  width: 560px;
+  max-height: 80vh;
+  overflow-y: auto;
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.modal-header h3 {
+  font-family: var(--font-title);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--neon-cyan);
+  margin: 0;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.btn-close:hover {
+  color: var(--neon-pink);
+}
+
+.form-body {
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-family: var(--font-title);
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  color: var(--neon-cyan);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-default);
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); opacity: 0.7; }
+  20% { transform: translate(-2px, 2px); opacity: 0.8; }
+  40% { transform: translate(-2px, -2px); opacity: 0.7; }
+  60% { transform: translate(2px, 2px); opacity: 0.8; }
+  80% { transform: translate(2px, -2px); opacity: 0.7; }
+  100% { transform: translate(0); opacity: 0.7; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
 </style>

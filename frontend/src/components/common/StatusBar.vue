@@ -1,67 +1,115 @@
 <template>
   <footer class="status-bar">
-    <span class="status-item">
-      📊 当前会话: {{ requestCount }} 次请求
-    </span>
-    <span class="status-item" :class="backendStatus">
-      {{ backendStatus === 'connected' ? '🟢' : '🔴' }}
-      后端服务 {{ backendStatus === 'connected' ? '正常' : '异常' }}
-    </span>
-    <span class="status-tip">💡 双击集合快速加载</span>
+    <div class="status-left">
+      <span class="status-item">
+        <span class="status-dot online"></span>
+        <span>SYSTEM ONLINE</span>
+      </span>
+      <span class="status-item">
+        <span class="separator">|</span>
+        <span>v1.0.0</span>
+      </span>
+    </div>
+    <div class="status-right">
+      <span class="status-item">
+        <span class="label">ENV:</span>
+        <span class="value">{{ envName }}</span>
+      </span>
+      <span class="status-item">
+        <span class="separator">|</span>
+        <span>{{ currentTime }}</span>
+      </span>
+    </div>
   </footer>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import axios from 'axios'
 
-const requestCount = ref(0)
-const backendStatus = ref('disconnected')
+const envName = ref('DEV')
+const currentTime = ref('')
+let timeInterval = null
 
-async function checkBackend() {
-  try {
-    await axios.get('http://localhost:8000/', { timeout: 3000 })
-    backendStatus.value = 'connected'
-  } catch (e) {
-    backendStatus.value = 'disconnected'
-  }
+function updateTime() {
+  const now = new Date()
+  currentTime.value = now.toLocaleTimeString('en-US', { hour12: false }) + ' UTC'
 }
 
-let interval
 onMounted(() => {
-  checkBackend()
-  interval = setInterval(checkBackend, 30000)
+  updateTime()
+  timeInterval = setInterval(updateTime, 1000)
 })
 
 onUnmounted(() => {
-  clearInterval(interval)
-})
-
-// 监听发送请求事件
-window.addEventListener('request-sent', () => {
-  requestCount.value++
+  if (timeInterval) clearInterval(timeInterval)
 })
 </script>
 
 <style scoped>
 .status-bar {
-  height: var(--status-bar-height);
-  background: var(--bg);
-  border-top: 1px solid var(--border);
+  height: 28px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0 16px;
-  gap: 24px;
-  font-size: 11px;
-  color: var(--text);
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--neon-cyan);
+  box-shadow: 0 -1px 0 rgba(0, 255, 255, 0.2);
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
+  z-index: 100;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
 }
+
+.status-left, .status-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .status-item {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: pulse-glow 2s infinite;
+}
+
+.status-dot.online {
+  background: var(--neon-green);
+  box-shadow: 0 0 5px var(--neon-green);
+}
+
+.status-dot.offline {
+  background: #f00;
+  box-shadow: 0 0 5px #f00;
+}
+
+.separator {
+  color: var(--border-default);
+}
+
+.label {
+  color: var(--text-secondary);
+}
+
+.value {
+  color: var(--neon-cyan);
+  font-weight: 600;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 </style>

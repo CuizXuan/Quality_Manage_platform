@@ -5,13 +5,15 @@
         :class="{ active: activeTab === 'collections' }"
         @click="activeTab = 'collections'"
       >
-        📁 集合
+        <span class="tab-icon">☰</span>
+        <span>集合</span>
       </button>
       <button
         :class="{ active: activeTab === 'history' }"
         @click="activeTab = 'history'"
       >
-        🕐 历史
+        <span class="tab-icon">◷</span>
+        <span>历史</span>
       </button>
     </div>
 
@@ -20,10 +22,10 @@
       <div class="sidebar-toolbar">
         <input
           v-model="searchKeyword"
-          placeholder="搜索集合..."
-          class="search-input"
+          placeholder="SEARCH..."
+          class="cyber-input"
         />
-        <button class="btn-add" @click="showAddCollection = true" title="新建集合">+</button>
+        <button class="cyber-btn-small" @click="showAddCollection = true" title="新建集合">+</button>
       </div>
 
       <!-- 添加集合弹窗 -->
@@ -31,11 +33,12 @@
         <input
           v-model="newCollectionName"
           placeholder="集合名称"
+          class="cyber-input"
           @keyup.enter="createCollection"
           ref="newColInput"
         />
-        <button @click="createCollection">✓</button>
-        <button @click="showAddCollection = false">✕</button>
+        <button class="cyber-btn-small success" @click="createCollection">✓</button>
+        <button class="cyber-btn-small danger" @click="showAddCollection = false">✕</button>
       </div>
 
       <!-- 集合树 -->
@@ -48,7 +51,7 @@
           <div class="collection-header" @click="toggleCollection(col.id)">
             <span class="expand-icon">{{ expandedCollections.includes(col.id) ? '📂' : '📁' }}</span>
             <span class="col-name">{{ col.name }}</span>
-            <span class="col-count">{{ col.requests.length }}</span>
+            <span class="col-count">[{{ col.requests.length }}]</span>
           </div>
           <div v-show="expandedCollections.includes(col.id)" class="request-list">
             <div
@@ -63,12 +66,12 @@
               <span class="request-name">{{ req.name || req.url }}</span>
             </div>
             <div v-if="col.requests.length === 0" class="empty-tip">
-              空集合
+              -- EMPTY --
             </div>
           </div>
         </div>
         <div v-if="filteredCollections.length === 0" class="empty-tip">
-          暂无集合，点击 + 新建
+          <span class="glitch">// NO DATA</span>
         </div>
       </div>
     </div>
@@ -78,10 +81,10 @@
       <div class="sidebar-toolbar">
         <input
           v-model="historyKeyword"
-          placeholder="搜索历史..."
-          class="search-input"
+          placeholder="SEARCH..."
+          class="cyber-input"
         />
-        <button class="btn-add" @click="clearHistory" title="清空历史">🗑</button>
+        <button class="cyber-btn-small danger" @click="clearHistory" title="清空历史">🗑</button>
       </div>
       <div class="history-list">
         <div
@@ -98,14 +101,17 @@
           </div>
           <div class="history-url">{{ item.url }}</div>
           <div class="history-status" :class="getStatusClass(item.statusCode)">
-            {{ item.statusCode || '错误' }}
+            {{ item.statusCode || 'ERR' }}
           </div>
         </div>
         <div v-if="filteredHistory.length === 0" class="empty-tip">
-          暂无历史记录
+          <span class="glitch">// NO HISTORY</span>
         </div>
       </div>
     </div>
+
+    <!-- Scanline overlay -->
+    <div class="sidebar-scanlines"></div>
   </aside>
 </template>
 
@@ -190,15 +196,16 @@ function loadHistoryItem(item) {
 }
 
 function formatTime(isoString) {
+  if (!isoString) return ''
   const date = new Date(isoString)
   const now = new Date()
   const diff = now - date
   const minutes = Math.floor(diff / 60000)
-  if (minutes < 1) return '刚刚'
-  if (minutes < 60) return `${minutes}分钟前`
+  if (minutes < 1) return 'NOW'
+  if (minutes < 60) return `${minutes}m`
   const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}小时前`
-  return `${Math.floor(hours / 24)}天前`
+  if (hours < 24) return `${hours}h`
+  return `${Math.floor(hours / 24)}d`
 }
 
 function getStatusClass(code) {
@@ -212,175 +219,278 @@ function getStatusClass(code) {
 <style scoped>
 .sidebar {
   width: var(--sidebar-width);
-  height: calc(100vh - var(--header-height) - var(--status-bar-height));
-  background: var(--bg);
-  border-right: 1px solid var(--border);
+  height: calc(100vh - var(--header-height) - 28px);
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border-default);
   display: flex;
   flex-direction: column;
   position: fixed;
   top: var(--header-height);
   left: 0;
   overflow: hidden;
-  font-size: 14px;
+  font-size: 13px;
+  z-index: 50;
 }
+
 .sidebar-tabs {
   display: flex;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-default);
 }
+
 .sidebar-tabs button {
   flex: 1;
-  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 8px;
   background: transparent;
   border: none;
-  color: var(--text);
-  font-size: 12px;
-  cursor: pointer;
   border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-title);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
   transition: all var(--transition-fast);
 }
+
 .sidebar-tabs button.active {
-  color: var(--primary);
-  border-bottom-color: var(--primary);
+  color: var(--neon-cyan);
+  background: rgba(0, 255, 255, 0.1);
+  border-bottom-color: var(--neon-cyan);
+  text-shadow: 0 0 10px var(--neon-cyan);
 }
-.sidebar-tabs button:hover {
-  color: var(--text-h);
+
+.sidebar-tabs button:hover:not(.active) {
+  color: var(--neon-cyan);
+  background: rgba(0, 255, 255, 0.05);
 }
+
+.tab-icon {
+  font-size: 14px;
+}
+
 .sidebar-content {
   flex: 1;
   overflow-y: auto;
   padding: 8px;
+  position: relative;
 }
+
 .sidebar-toolbar {
   display: flex;
   gap: 6px;
   margin-bottom: 8px;
 }
-.search-input {
+
+.cyber-input {
   flex: 1;
-  padding: 5px 8px;
-  font-size: 12px;
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  color: var(--neon-cyan);
+  outline: none;
 }
-.btn-add {
+
+.cyber-input:focus {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3), inset 0 0 10px rgba(0, 255, 255, 0.1);
+}
+
+.cyber-input::placeholder {
+  color: rgba(0, 255, 255, 0.3);
+}
+
+.cyber-btn-small {
   width: 28px;
   height: 28px;
-  background: var(--social-bg);
-  border: 1px solid var(--border);
-  color: var(--text-h);
-  border-radius: 4px;
-  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
   font-size: 14px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
 }
-.btn-add:hover {
-  background: var(--primary);
-  color: #fff;
+
+.cyber-btn-small:hover {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
 }
+
+.cyber-btn-small.success {
+  border-color: var(--neon-green);
+  color: var(--neon-green);
+}
+
+.cyber-btn-small.danger {
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+}
+
 .inline-input {
   display: flex;
   gap: 4px;
   margin-bottom: 8px;
 }
-.inline-input input {
+
+.inline-input .cyber-input {
   flex: 1;
-  padding: 5px 8px;
-  font-size: 12px;
 }
-.inline-input button {
-  padding: 5px 8px;
-  background: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
+
 .collection-header {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 8px;
+  gap: 8px;
+  padding: 8px 10px;
   cursor: pointer;
   border-radius: 4px;
-  color: var(--text-h);
-  font-size: 13px;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-title);
+  font-size: 11px;
+  letter-spacing: 1px;
+  transition: all var(--transition-fast);
 }
+
 .collection-header:hover {
-  background: var(--bg-secondary);
+  background: rgba(0, 255, 255, 0.05);
+  border-color: rgba(0, 255, 255, 0.2);
+  color: var(--neon-cyan);
 }
+
 .col-name {
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-transform: uppercase;
 }
+
 .col-count {
-  color: var(--text);
-  font-size: 11px;
+  font-size: 10px;
+  color: var(--text-secondary);
 }
+
 .request-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 8px 5px 24px;
+  gap: 8px;
+  padding: 6px 10px 6px 24px;
   cursor: pointer;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 11px;
+  border-left: 2px solid transparent;
+  transition: all var(--transition-fast);
 }
+
 .request-item:hover {
-  background: var(--bg-secondary);
+  background: rgba(0, 255, 255, 0.05);
+  border-left-color: var(--neon-cyan);
 }
+
 .request-name {
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: var(--text);
+  color: var(--text-primary);
 }
-.method-badge {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 1px 4px;
-  border-radius: 3px;
-  flex-shrink: 0;
-}
+
 .history-item {
-  padding: 8px;
+  padding: 10px;
   cursor: pointer;
   border-radius: 4px;
   margin-bottom: 4px;
   position: relative;
+  border: 1px solid transparent;
+  transition: all var(--transition-fast);
 }
+
 .history-item:hover {
-  background: var(--bg-secondary);
+  background: rgba(0, 255, 255, 0.05);
+  border-color: rgba(0, 255, 255, 0.2);
 }
+
 .history-meta {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   margin-bottom: 4px;
 }
+
 .history-time {
-  color: var(--text);
-  font-size: 11px;
+  color: var(--text-secondary);
+  font-size: 10px;
+  letter-spacing: 1px;
 }
+
 .history-url {
-  color: var(--text);
-  font-size: 12px;
+  font-size: 11px;
+  color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-family: var(--font-mono);
 }
+
 .history-status {
   position: absolute;
-  right: 8px;
-  top: 8px;
-  font-size: 11px;
+  right: 10px;
+  top: 10px;
+  font-family: var(--font-title);
+  font-size: 10px;
   font-weight: 600;
+  letter-spacing: 1px;
 }
-.status-success { color: var(--success); }
-.status-error { color: var(--danger); }
+
+.status-success { color: var(--neon-green); }
+.status-error { color: #f00; }
+
 .empty-tip {
   text-align: center;
-  color: var(--text);
-  font-size: 12px;
-  padding: 16px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  padding: 20px;
+  font-family: var(--font-mono);
+}
+
+.glitch {
+  animation: glitch 0.5s infinite;
+}
+
+.sidebar-scanlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 201, 167, 0.03) 0px,
+    rgba(0, 201, 167, 0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); opacity: 0.7; }
+  20% { transform: translate(-1px, 1px); opacity: 0.8; }
+  40% { transform: translate(-1px, -1px); opacity: 0.7; }
+  60% { transform: translate(1px, 1px); opacity: 0.8; }
+  80% { transform: translate(1px, -1px); opacity: 0.7; }
+  100% { transform: translate(0); opacity: 0.7; }
 }
 </style>
