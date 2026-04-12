@@ -26,6 +26,11 @@ class TestCase(Base):
     timeout = Column(Integer, default=30)
     follow_redirects = Column(Boolean, default=True)
     verify_ssl = Column(Boolean, default=True)
+    # Phase 3: 用例-代码关联字段
+    code_file_id = Column(Integer, nullable=True)
+    code_method_id = Column(Integer, nullable=True)
+    coverage_threshold = Column(Integer, nullable=True)
+    unit_test_path = Column(String(500), default="")
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 

@@ -5,7 +5,10 @@ from typing import List, Optional
 import json
 from app.database import get_db
 from app.models.case import TestCase
-from app.schemas.case import TestCaseCreate, TestCaseUpdate, TestCaseResponse
+from app.models.environment import Environment
+from app.models.execution_log import ExecutionLog
+from app.schemas.case import TestCaseCreate, TestCaseUpdate, TestCaseResponse, RunCaseRequest
+from app.services.request_executor import RequestExecutor
 
 router = APIRouter(prefix="/api/cases", tags=["Cases"])
 
@@ -130,6 +133,59 @@ def batch_delete_cases(ids: List[int], db: Session = Depends(get_db)):
     db.query(TestCase).filter(TestCase.id.in_(ids)).delete(synchronize_session=False)
     db.commit()
     return {"code": 0, "message": f"deleted {len(ids)} cases"}
+
+
+@router.post("/{case_id}/run")
+async def run_case(case_id: int, body: RunCaseRequest, db: Session = Depends(get_db)):
+    case = db.query(TestCase).filter(TestCase.id == case_id).first()
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found")
+
+    # 获取环境变量
+    env_vars = {}
+    env_id = body.environment_id
+    if env_id:
+        env = db.query(Environment).filter(Environment.id == env_id).first()
+        if env:
+            env_vars = json.loads(env.variables or "{}")
+    else:
+        # 使用默认环境
+        env = db.query(Environment).filter(Environment.is_default == True).first()
+        if env:
+            env_id = env.id
+            env_vars = json.loads(env.variables or "{}")
+
+    case_data = _parse_case(case)
+
+    # 执行用例
+    executor = RequestExecutor()
+    result = await executor.execute_case(case_data, env_vars, body.variables)
+
+    # 保存执行记录
+    log = ExecutionLog(
+        case_id=case_id,
+        scenario_id=None,
+        scenario_step_id=None,
+        execution_type="single",
+        execution_id=result["execution_id"],
+        request_url=case.url,
+        request_method=case.method,
+        request_headers=case.headers,
+        request_body=case.body,
+        response_status=result["response"]["status_code"],
+        response_headers=json.dumps(result["response"]["headers"]),
+        response_body=json.dumps(result["response"]["body"]) if isinstance(result["response"]["body"], (dict, list)) else str(result["response"]["body"]),
+        response_size=result["response"]["size"],
+        response_time_ms=result["response"]["time_ms"],
+        status=result["status"],
+        assertion_results=json.dumps(result["assertion_results"]),
+        environment_id=env_id,
+        triggered_by="user",
+    )
+    db.add(log)
+    db.commit()
+
+    return {"code": 0, "message": "success", "data": result}
 
 
 def _parse_case(case: TestCase) -> dict:

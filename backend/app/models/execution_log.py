@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Index
+from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.models.base import Base
 
@@ -27,6 +28,9 @@ class ExecutionLog(Base):
     environment_id = Column(Integer, ForeignKey("environment.id", ondelete="SET NULL"), nullable=True)
     triggered_by = Column(String(50), default="user")
     created_at = Column(DateTime, default=datetime.now)
+
+    # Phase 5
+    self_heal_logs = relationship("SelfHealLog", back_populates="failure_log")
 
     __table_args__ = (
         Index("idx_execution_log_case", "case_id"),

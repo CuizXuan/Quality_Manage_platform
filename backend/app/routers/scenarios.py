@@ -5,10 +5,14 @@ import json
 from app.database import get_db
 from app.models.scenario import Scenario, ScenarioStep
 from app.models.case import TestCase
+from app.models.environment import Environment
+from app.models.execution_log import ExecutionLog
 from app.schemas.scenario import (
     ScenarioCreate, ScenarioUpdate, ScenarioResponse,
     ScenarioStepCreate, ScenarioStepUpdate, ScenarioStepResponse,
 )
+from app.schemas.case import RunCaseRequest
+from app.services.scenario_executor import ScenarioExecutor
 
 router = APIRouter(prefix="/api/scenarios", tags=["Scenarios"])
 
@@ -120,6 +124,74 @@ def reorder_steps(scenario_id: int, step_ids: List[int], db: Session = Depends(g
             step.step_order = order
     db.commit()
     return {"code": 0, "message": "reordered"}
+
+
+@router.post("/{scenario_id}/run")
+async def run_scenario(scenario_id: int, body: RunCaseRequest, db: Session = Depends(get_db)):
+    scenario = db.query(Scenario).filter(Scenario.id == scenario_id).first()
+    if not scenario:
+        raise HTTPException(status_code=404, detail="Scenario not found")
+
+    # 获取环境变量
+    env_vars = {}
+    env_id = body.environment_id
+    if env_id:
+        env = db.query(Environment).filter(Environment.id == env_id).first()
+        if env:
+            env_vars = json.loads(env.variables or "{}")
+    else:
+        env = db.query(Environment).filter(Environment.is_default == True).first()
+        if env:
+            env_id = env.id
+            env_vars = json.loads(env.variables or "{}")
+
+    # 构建场景数据（含步骤和用例详情）
+    scenario_data = _parse_scenario(scenario, db)
+
+    # 填充每个步骤的用例数据
+    for step in scenario_data["steps"]:
+        case = db.query(TestCase).filter(TestCase.id == step["case_id"]).first()
+        if case:
+            from app.routers.cases import _parse_case
+            step["case_data"] = _parse_case(case)
+
+    # 执行场景
+    executor = ScenarioExecutor()
+    result = await executor.execute_scenario(scenario_data, env_vars, body.variables)
+
+    # 保存每个步骤的执行记录
+    for step_result in result.get("steps", []):
+        case_id = step_result.get("case_id")
+        step_order = step_result.get("step_order")
+        step_record = db.query(ScenarioStep).filter(
+            ScenarioStep.scenario_id == scenario_id,
+            ScenarioStep.step_order == step_order
+        ).first()
+
+        log = ExecutionLog(
+            case_id=case_id,
+            scenario_id=scenario_id,
+            scenario_step_id=step_record.id if step_record else None,
+            execution_type="scenario",
+            execution_id=result["execution_id"],
+            request_url="",
+            request_method="",
+            request_headers="{}",
+            request_body="",
+            response_status=200 if step_result["status"] == "success" else 0,
+            response_headers="{}",
+            response_body=json.dumps(step_result.get("assertion_results", [])),
+            response_size=0,
+            response_time_ms=step_result.get("response_time_ms", 0),
+            status=step_result["status"],
+            assertion_results=json.dumps(step_result.get("assertion_results", [])),
+            environment_id=env_id,
+            triggered_by="user",
+        )
+        db.add(log)
+
+    db.commit()
+    return {"code": 0, "message": "success", "data": result}
 
 
 def _parse_scenario(scenario: Scenario, db: Session) -> dict:

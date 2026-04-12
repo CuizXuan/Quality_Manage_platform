@@ -242,6 +242,12 @@ function downloadResponse() {
   flex-direction: column;
 }
 
+/* 禁用 panel 角落装饰 */
+.response-panel::before,
+.response-panel::after {
+  display: none;
+}
+
 .panel-header {
   display: flex;
   justify-content: space-between;

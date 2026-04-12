@@ -229,7 +229,7 @@ h1, h2, h3, h4, h5, h6 {
   opacity: 0.3;
 }
 
-/* Corner Decorations */
+/* Corner Decorations - 仅 hover 时显示 */
 .panel::after {
   content: '';
   position: absolute;
@@ -239,7 +239,16 @@ h1, h2, h3, h4, h5, h6 {
   height: 20px;
   border-top: 2px solid var(--neon-cyan);
   border-right: 2px solid var(--neon-cyan);
-  box-shadow: var(--glow-cyan);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.panel:hover::after {
+  opacity: 1;
+}
+
+.panel:hover::before {
+  opacity: 0.3;
 }
 
 /* ========================================

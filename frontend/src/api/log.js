@@ -1,13 +1,23 @@
 import axios from 'axios'
 
+const authInterceptor = config => {
+  const token = localStorage.getItem('access_token')
+  if (token) config.headers.Authorization = 'Bearer ' + token
+  return config
+}
+
 const client = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: '/api',
   timeout: 60000,
 })
 
+client.interceptors.request.use(authInterceptor)
+
 export const logsApi = {
-  list: (params = {}) => client.get('/api/logs', { params }),
-  get: (id) => client.get(`/api/logs/${id}`),
-  delete: (id) => client.delete(`/api/logs/${id}`),
-  batchDelete: (ids) => client.post('/api/logs/batch-delete', ids),
+  list: (params = {}) => client.get('/logs', { params }),
+  get: (id) => client.get('/logs/' + id),
+  delete: (id) => client.delete('/logs/' + id),
+  batchDelete: (ids) => client.post('/logs/batch-delete', ids),
 }
+
+export default client

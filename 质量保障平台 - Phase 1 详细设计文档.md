@@ -8,14 +8,14 @@
 
 ### 1.2 核心目标
 
-| 目标       | 说明                          | 成功标准                  |
-| :--------- | :---------------------------- | :------------------------ |
-| 数据持久化 | 从 LocalStorage 迁移到 SQLite | 关闭浏览器后数据不丢失    |
-| 用例管理   | 接口请求保存为可复用用例      | 支持 CRUD、文件夹组织     |
-| 环境管理   | 多环境配置与切换              | 变量正确替换              |
-| 断言机制   | 自动校验响应结果              | 支持状态码、JSONPath 断言 |
-| 场景编排   | 多用例串联执行                | 支持变量提取与传递        |
-| CLI 工具   | 命令行执行测试                | 输出 JUnit 格式报告       |
+| 目标     | 说明                        | 成功标准              |
+|:------ |:------------------------- |:----------------- |
+| 数据持久化  | 从 LocalStorage 迁移到 SQLite | 关闭浏览器后数据不丢失       |
+| 用例管理   | 接口请求保存为可复用用例              | 支持 CRUD、文件夹组织     |
+| 环境管理   | 多环境配置与切换                  | 变量正确替换            |
+| 断言机制   | 自动校验响应结果                  | 支持状态码、JSONPath 断言 |
+| 场景编排   | 多用例串联执行                   | 支持变量提取与传递         |
+| CLI 工具 | 命令行执行测试                   | 输出 JUnit 格式报告     |
 
 ### 1.3 不包含内容
 
@@ -78,14 +78,14 @@ text
 
 ### 2.2 模块职责说明
 
-| 模块           | 职责                                                      | 依赖             |
-| :------------- | :-------------------------------------------------------- | :--------------- |
-| **变量引擎**   | 管理多层级变量（环境/场景/步骤），支持 `{{var}}` 语法替换 | 无               |
-| **断言引擎**   | 执行断言规则，支持状态码/JSONPath/响应头/响应时间         | JSONPath 库      |
-| **提取引擎**   | 从响应中提取变量（JSONPath/正则/Header）                  | 变量引擎         |
-| **脚本引擎**   | 执行前置/后置脚本（Python 安全沙箱）                      | RestrictedPython |
-| **请求执行器** | 统一请求执行入口，协调各引擎完成请求                      | 上述所有引擎     |
-| **数据访问层** | ORM 模型定义与数据库操作                                  | SQLAlchemy       |
+| 模块        | 职责                                  | 依赖               |
+|:--------- |:----------------------------------- |:---------------- |
+| **变量引擎**  | 管理多层级变量（环境/场景/步骤），支持 `{{var}}` 语法替换 | 无                |
+| **断言引擎**  | 执行断言规则，支持状态码/JSONPath/响应头/响应时间      | JSONPath 库       |
+| **提取引擎**  | 从响应中提取变量（JSONPath/正则/Header）        | 变量引擎             |
+| **脚本引擎**  | 执行前置/后置脚本（Python 安全沙箱）              | RestrictedPython |
+| **请求执行器** | 统一请求执行入口，协调各引擎完成请求                  | 上述所有引擎           |
+| **数据访问层** | ORM 模型定义与数据库操作                      | SQLAlchemy       |
 
 ------
 
@@ -131,29 +131,29 @@ text
 
 #### 3.2.1 用例表 `test_case`
 
-| 字段             | 类型         | 约束                      | 说明                            |
-| :--------------- | :----------- | :------------------------ | :------------------------------ |
-| id               | INTEGER      | PRIMARY KEY               | 自增主键                        |
-| name             | VARCHAR(200) | NOT NULL                  | 用例名称                        |
-| description      | TEXT         |                           | 用例描述                        |
-| method           | VARCHAR(10)  | NOT NULL                  | GET/POST/PUT/DELETE/PATCH       |
-| url              | TEXT         | NOT NULL                  | 请求 URL，支持变量              |
-| headers          | TEXT         |                           | JSON 格式请求头                 |
-| params           | TEXT         |                           | JSON 格式 Query 参数            |
-| body             | TEXT         |                           | 请求体内容                      |
-| body_type        | VARCHAR(20)  | DEFAULT 'json'            | json/form/xml/raw/binary        |
-| auth_type        | VARCHAR(20)  | DEFAULT 'none'            | none/basic/bearer/api_key       |
+| 字段               | 类型           | 约束                        | 说明                        |
+|:---------------- |:------------ |:------------------------- |:------------------------- |
+| id               | INTEGER      | PRIMARY KEY               | 自增主键                      |
+| name             | VARCHAR(200) | NOT NULL                  | 用例名称                      |
+| description      | TEXT         |                           | 用例描述                      |
+| method           | VARCHAR(10)  | NOT NULL                  | GET/POST/PUT/DELETE/PATCH |
+| url              | TEXT         | NOT NULL                  | 请求 URL，支持变量               |
+| headers          | TEXT         |                           | JSON 格式请求头                |
+| params           | TEXT         |                           | JSON 格式 Query 参数          |
+| body             | TEXT         |                           | 请求体内容                     |
+| body_type        | VARCHAR(20)  | DEFAULT 'json'            | json/form/xml/raw/binary  |
+| auth_type        | VARCHAR(20)  | DEFAULT 'none'            | none/basic/bearer/api_key |
 | auth_config      | TEXT         |                           | JSON 格式认证配置               |
-| folder_path      | VARCHAR(500) |                           | 文件夹路径，如 "/用户模块/登录" |
-| sort_order       | INTEGER      | DEFAULT 0                 | 排序序号                        |
-| assertions       | TEXT         |                           | JSON 数组，断言规则             |
-| pre_script       | TEXT         |                           | 前置脚本                        |
-| post_script      | TEXT         |                           | 后置脚本                        |
-| timeout          | INTEGER      | DEFAULT 30                | 超时时间（秒）                  |
-| follow_redirects | BOOLEAN      | DEFAULT 1                 | 是否跟随重定向                  |
-| verify_ssl       | BOOLEAN      | DEFAULT 1                 | 是否验证 SSL                    |
-| created_at       | TIMESTAMP    | DEFAULT CURRENT_TIMESTAMP | 创建时间                        |
-| updated_at       | TIMESTAMP    | DEFAULT CURRENT_TIMESTAMP | 更新时间                        |
+| folder_path      | VARCHAR(500) |                           | 文件夹路径，如 "/用户模块/登录"        |
+| sort_order       | INTEGER      | DEFAULT 0                 | 排序序号                      |
+| assertions       | TEXT         |                           | JSON 数组，断言规则              |
+| pre_script       | TEXT         |                           | 前置脚本                      |
+| post_script      | TEXT         |                           | 后置脚本                      |
+| timeout          | INTEGER      | DEFAULT 30                | 超时时间（秒）                   |
+| follow_redirects | BOOLEAN      | DEFAULT 1                 | 是否跟随重定向                   |
+| verify_ssl       | BOOLEAN      | DEFAULT 1                 | 是否验证 SSL                  |
+| created_at       | TIMESTAMP    | DEFAULT CURRENT_TIMESTAMP | 创建时间                      |
+| updated_at       | TIMESTAMP    | DEFAULT CURRENT_TIMESTAMP | 更新时间                      |
 
 **索引**：
 
@@ -203,26 +203,26 @@ json
 
 **断言类型与操作符对照表**：
 
-| 断言类型      | 适用操作符                                                   | 说明             |
-| :------------ | :----------------------------------------------------------- | :--------------- |
-| status_code   | equals, not_equals                                           | HTTP 状态码      |
-| json_path     | equals, not_equals, contains, exists, not_exists, greater_than, less_than | JSONPath 取值    |
-| response_time | less_than, greater_than                                      | 响应耗时（毫秒） |
-| header        | equals, contains, exists                                     | 响应头校验       |
-| body_contains | contains, not_contains                                       | 响应体包含文本   |
+| 断言类型          | 适用操作符                                                                     | 说明          |
+|:------------- |:------------------------------------------------------------------------- |:----------- |
+| status_code   | equals, not_equals                                                        | HTTP 状态码    |
+| json_path     | equals, not_equals, contains, exists, not_exists, greater_than, less_than | JSONPath 取值 |
+| response_time | less_than, greater_than                                                   | 响应耗时（毫秒）    |
+| header        | equals, contains, exists                                                  | 响应头校验       |
+| body_contains | contains, not_contains                                                    | 响应体包含文本     |
 
 #### 3.2.3 环境表 `environment`
 
-| 字段        | 类型        | 约束                      | 说明                  |
-| :---------- | :---------- | :------------------------ | :-------------------- |
-| id          | INTEGER     | PRIMARY KEY               | 自增主键              |
-| name        | VARCHAR(50) | UNIQUE, NOT NULL          | 环境名称              |
-| description | TEXT        |                           | 环境描述              |
+| 字段          | 类型          | 约束                        | 说明            |
+|:----------- |:----------- |:------------------------- |:------------- |
+| id          | INTEGER     | PRIMARY KEY               | 自增主键          |
+| name        | VARCHAR(50) | UNIQUE, NOT NULL          | 环境名称          |
+| description | TEXT        |                           | 环境描述          |
 | variables   | TEXT        |                           | JSON 对象，变量键值对 |
-| is_default  | BOOLEAN     | DEFAULT 0                 | 是否为默认环境        |
-| sort_order  | INTEGER     | DEFAULT 0                 | 排序序号              |
-| created_at  | TIMESTAMP   | DEFAULT CURRENT_TIMESTAMP | 创建时间              |
-| updated_at  | TIMESTAMP   | DEFAULT CURRENT_TIMESTAMP | 更新时间              |
+| is_default  | BOOLEAN     | DEFAULT 0                 | 是否为默认环境       |
+| sort_order  | INTEGER     | DEFAULT 0                 | 排序序号          |
+| created_at  | TIMESTAMP   | DEFAULT CURRENT_TIMESTAMP | 创建时间          |
+| updated_at  | TIMESTAMP   | DEFAULT CURRENT_TIMESTAMP | 更新时间          |
 
 **variables 字段示例**：
 
@@ -240,29 +240,29 @@ json
 
 #### 3.2.4 场景表 `scenario`
 
-| 字段        | 类型         | 约束                      | 说明                        |
-| :---------- | :----------- | :------------------------ | :-------------------------- |
-| id          | INTEGER      | PRIMARY KEY               | 自增主键                    |
-| name        | VARCHAR(200) | NOT NULL                  | 场景名称                    |
-| description | TEXT         |                           | 场景描述                    |
-| folder_path | VARCHAR(500) |                           | 文件夹路径                  |
+| 字段          | 类型           | 约束                        | 说明               |
+|:----------- |:------------ |:------------------------- |:---------------- |
+| id          | INTEGER      | PRIMARY KEY               | 自增主键             |
+| name        | VARCHAR(200) | NOT NULL                  | 场景名称             |
+| description | TEXT         |                           | 场景描述             |
+| folder_path | VARCHAR(500) |                           | 文件夹路径            |
 | variables   | TEXT         |                           | JSON 对象，场景级变量初始值 |
-| created_at  | TIMESTAMP    | DEFAULT CURRENT_TIMESTAMP | 创建时间                    |
-| updated_at  | TIMESTAMP    | DEFAULT CURRENT_TIMESTAMP | 更新时间                    |
+| created_at  | TIMESTAMP    | DEFAULT CURRENT_TIMESTAMP | 创建时间             |
+| updated_at  | TIMESTAMP    | DEFAULT CURRENT_TIMESTAMP | 更新时间             |
 
 #### 3.2.5 场景步骤表 `scenario_step`
 
-| 字段            | 类型    | 约束         | 说明                    |
-| :-------------- | :------ | :----------- | :---------------------- |
-| id              | INTEGER | PRIMARY KEY  | 自增主键                |
-| scenario_id     | INTEGER | FOREIGN KEY  | 关联场景 ID             |
-| case_id         | INTEGER | FOREIGN KEY  | 关联用例 ID             |
-| step_order      | INTEGER | NOT NULL     | 步骤顺序                |
+| 字段              | 类型      | 约束           | 说明             |
+|:--------------- |:------- |:------------ |:-------------- |
+| id              | INTEGER | PRIMARY KEY  | 自增主键           |
+| scenario_id     | INTEGER | FOREIGN KEY  | 关联场景 ID        |
+| case_id         | INTEGER | FOREIGN KEY  | 关联用例 ID        |
+| step_order      | INTEGER | NOT NULL     | 步骤顺序           |
 | extract_rules   | TEXT    |              | JSON 数组，变量提取规则 |
-| skip_on_failure | BOOLEAN | DEFAULT 1    | 失败时是否跳过后续步骤  |
-| retry_times     | INTEGER | DEFAULT 0    | 失败重试次数            |
-| retry_interval  | INTEGER | DEFAULT 1000 | 重试间隔（毫秒）        |
-| enabled         | BOOLEAN | DEFAULT 1    | 是否启用                |
+| skip_on_failure | BOOLEAN | DEFAULT 1    | 失败时是否跳过后续步骤    |
+| retry_times     | INTEGER | DEFAULT 0    | 失败重试次数         |
+| retry_interval  | INTEGER | DEFAULT 1000 | 重试间隔（毫秒）       |
+| enabled         | BOOLEAN | DEFAULT 1    | 是否启用           |
 
 **唯一索引**：`idx_scenario_step_order` ON (scenario_id, step_order)
 
@@ -303,38 +303,38 @@ json
 
 **提取源类型**：
 
-| source          | 说明        | 需要字段                   |
-| :-------------- | :---------- | :------------------------- |
-| response_body   | 响应体 JSON | path (JSONPath)            |
-| response_header | 响应头      | header_name                |
-| response_cookie | Cookie      | cookie_name                |
-| regex           | 正则提取    | pattern (从响应体文本提取) |
+| source          | 说明       | 需要字段               |
+|:--------------- |:-------- |:------------------ |
+| response_body   | 响应体 JSON | path (JSONPath)    |
+| response_header | 响应头      | header_name        |
+| response_cookie | Cookie   | cookie_name        |
+| regex           | 正则提取     | pattern (从响应体文本提取) |
 
 #### 3.2.7 执行记录表 `execution_log`
 
-| 字段              | 类型        | 约束                      | 说明                                          |
-| :---------------- | :---------- | :------------------------ | :-------------------------------------------- |
-| id                | INTEGER     | PRIMARY KEY               | 自增主键                                      |
-| case_id           | INTEGER     | FOREIGN KEY               | 关联用例 ID                                   |
-| scenario_id       | INTEGER     | FOREIGN KEY               | 关联场景 ID                                   |
-| scenario_step_id  | INTEGER     | FOREIGN KEY               | 关联场景步骤 ID                               |
+| 字段                | 类型          | 约束                        | 说明                                            |
+|:----------------- |:----------- |:------------------------- |:--------------------------------------------- |
+| id                | INTEGER     | PRIMARY KEY               | 自增主键                                          |
+| case_id           | INTEGER     | FOREIGN KEY               | 关联用例 ID                                       |
+| scenario_id       | INTEGER     | FOREIGN KEY               | 关联场景 ID                                       |
+| scenario_step_id  | INTEGER     | FOREIGN KEY               | 关联场景步骤 ID                                     |
 | execution_type    | VARCHAR(20) |                           | single/scenario/schedule                      |
-| execution_id      | VARCHAR(50) |                           | 批量执行的统一 ID                             |
-| request_url       | TEXT        |                           | 最终请求 URL（变量已替换）                    |
-| request_method    | VARCHAR(10) |                           | 请求方法                                      |
-| request_headers   | TEXT        |                           | 请求头快照                                    |
-| request_body      | TEXT        |                           | 请求体快照                                    |
-| response_status   | INTEGER     |                           | 响应状态码                                    |
-| response_headers  | TEXT        |                           | 响应头快照                                    |
-| response_body     | TEXT        |                           | 响应体快照                                    |
-| response_size     | INTEGER     |                           | 响应体大小（字节）                            |
-| response_time_ms  | INTEGER     |                           | 响应耗时（毫秒）                              |
+| execution_id      | VARCHAR(50) |                           | 批量执行的统一 ID                                    |
+| request_url       | TEXT        |                           | 最终请求 URL（变量已替换）                               |
+| request_method    | VARCHAR(10) |                           | 请求方法                                          |
+| request_headers   | TEXT        |                           | 请求头快照                                         |
+| request_body      | TEXT        |                           | 请求体快照                                         |
+| response_status   | INTEGER     |                           | 响应状态码                                         |
+| response_headers  | TEXT        |                           | 响应头快照                                         |
+| response_body     | TEXT        |                           | 响应体快照                                         |
+| response_size     | INTEGER     |                           | 响应体大小（字节）                                     |
+| response_time_ms  | INTEGER     |                           | 响应耗时（毫秒）                                      |
 | status            | VARCHAR(20) |                           | pending/running/success/failure/error/skipped |
-| error_message     | TEXT        |                           | 错误信息                                      |
-| assertion_results | TEXT        |                           | JSON 数组，断言执行结果                       |
-| environment_id    | INTEGER     | FOREIGN KEY               | 使用的环境 ID                                 |
+| error_message     | TEXT        |                           | 错误信息                                          |
+| assertion_results | TEXT        |                           | JSON 数组，断言执行结果                                |
+| environment_id    | INTEGER     | FOREIGN KEY               | 使用的环境 ID                                      |
 | triggered_by      | VARCHAR(50) |                           | user/schedule/cli                             |
-| created_at        | TIMESTAMP   | DEFAULT CURRENT_TIMESTAMP | 执行时间                                      |
+| created_at        | TIMESTAMP   | DEFAULT CURRENT_TIMESTAMP | 执行时间                                          |
 
 **索引**：
 
@@ -349,39 +349,39 @@ json
 
 ### 4.1 接口总览
 
-| 模块         | 方法   | 路径                                  | 说明                                 |
-| :----------- | :----- | :------------------------------------ | :----------------------------------- |
+| 模块       | 方法     | 路径                                    | 说明                 |
+|:-------- |:------ |:------------------------------------- |:------------------ |
 | **用例管理** | GET    | `/api/cases`                          | 获取用例列表（支持分页、文件夹筛选） |
-|              | POST   | `/api/cases`                          | 创建用例                             |
-|              | GET    | `/api/cases/{id}`                     | 获取用例详情                         |
-|              | PUT    | `/api/cases/{id}`                     | 更新用例                             |
-|              | DELETE | `/api/cases/{id}`                     | 删除用例                             |
-|              | POST   | `/api/cases/{id}/run`                 | 执行单个用例                         |
-|              | POST   | `/api/cases/{id}/duplicate`           | 复制用例                             |
-|              | POST   | `/api/cases/batch-delete`             | 批量删除                             |
-|              | GET    | `/api/folders`                        | 获取文件夹树                         |
-| **环境管理** | GET    | `/api/environments`                   | 获取环境列表                         |
-|              | POST   | `/api/environments`                   | 创建环境                             |
-|              | PUT    | `/api/environments/{id}`              | 更新环境                             |
-|              | DELETE | `/api/environments/{id}`              | 删除环境                             |
-|              | POST   | `/api/environments/{id}/set-default`  | 设为默认环境                         |
-| **场景管理** | GET    | `/api/scenarios`                      | 获取场景列表                         |
-|              | POST   | `/api/scenarios`                      | 创建场景                             |
-|              | GET    | `/api/scenarios/{id}`                 | 获取场景详情                         |
-|              | PUT    | `/api/scenarios/{id}`                 | 更新场景                             |
-|              | DELETE | `/api/scenarios/{id}`                 | 删除场景                             |
-|              | POST   | `/api/scenarios/{id}/run`             | 执行场景                             |
-|              | POST   | `/api/scenarios/{id}/steps`           | 添加场景步骤                         |
-|              | PUT    | `/api/scenarios/{id}/steps/{step_id}` | 更新步骤                             |
-|              | DELETE | `/api/scenarios/{id}/steps/{step_id}` | 删除步骤                             |
-|              | PUT    | `/api/scenarios/{id}/steps/reorder`   | 调整步骤顺序                         |
-| **执行记录** | GET    | `/api/logs`                           | 获取执行记录列表                     |
-|              | GET    | `/api/logs/{id}`                      | 获取执行详情                         |
-|              | DELETE | `/api/logs/{id}`                      | 删除执行记录                         |
-|              | DELETE | `/api/logs/batch-delete`              | 批量删除执行记录                     |
-| **数据迁移** | GET    | `/api/migrate/export`                 | 导出 LocalStorage 数据               |
-|              | POST   | `/api/migrate/import`                 | 导入数据到数据库                     |
-| **系统**     | GET    | `/api/health`                         | 健康检查                             |
+|          | POST   | `/api/cases`                          | 创建用例               |
+|          | GET    | `/api/cases/{id}`                     | 获取用例详情             |
+|          | PUT    | `/api/cases/{id}`                     | 更新用例               |
+|          | DELETE | `/api/cases/{id}`                     | 删除用例               |
+|          | POST   | `/api/cases/{id}/run`                 | 执行单个用例             |
+|          | POST   | `/api/cases/{id}/duplicate`           | 复制用例               |
+|          | POST   | `/api/cases/batch-delete`             | 批量删除               |
+|          | GET    | `/api/folders`                        | 获取文件夹树             |
+| **环境管理** | GET    | `/api/environments`                   | 获取环境列表             |
+|          | POST   | `/api/environments`                   | 创建环境               |
+|          | PUT    | `/api/environments/{id}`              | 更新环境               |
+|          | DELETE | `/api/environments/{id}`              | 删除环境               |
+|          | POST   | `/api/environments/{id}/set-default`  | 设为默认环境             |
+| **场景管理** | GET    | `/api/scenarios`                      | 获取场景列表             |
+|          | POST   | `/api/scenarios`                      | 创建场景               |
+|          | GET    | `/api/scenarios/{id}`                 | 获取场景详情             |
+|          | PUT    | `/api/scenarios/{id}`                 | 更新场景               |
+|          | DELETE | `/api/scenarios/{id}`                 | 删除场景               |
+|          | POST   | `/api/scenarios/{id}/run`             | 执行场景               |
+|          | POST   | `/api/scenarios/{id}/steps`           | 添加场景步骤             |
+|          | PUT    | `/api/scenarios/{id}/steps/{step_id}` | 更新步骤               |
+|          | DELETE | `/api/scenarios/{id}/steps/{step_id}` | 删除步骤               |
+|          | PUT    | `/api/scenarios/{id}/steps/reorder`   | 调整步骤顺序             |
+| **执行记录** | GET    | `/api/logs`                           | 获取执行记录列表           |
+|          | GET    | `/api/logs/{id}`                      | 获取执行详情             |
+|          | DELETE | `/api/logs/{id}`                      | 删除执行记录             |
+|          | DELETE | `/api/logs/batch-delete`              | 批量删除执行记录           |
+| **数据迁移** | GET    | `/api/migrate/export`                 | 导出 LocalStorage 数据 |
+|          | POST   | `/api/migrate/import`                 | 导入数据到数据库           |
+| **系统**   | GET    | `/api/health`                         | 健康检查               |
 
 ### 4.2 核心接口详细说明
 
@@ -606,13 +606,13 @@ json
 
 **变量优先级（从高到低）**：
 
-| 优先级 | 作用域       | 生命周期     | 典型用途           |
-| :----- | :----------- | :----------- | :----------------- |
-| 1      | 步骤变量     | 单次请求     | 临时覆盖、动态生成 |
-| 2      | 场景变量     | 场景执行期间 | 步骤间数据传递     |
-| 3      | 数据驱动变量 | 单次迭代     | CSV/JSON 数据行    |
-| 4      | 环境变量     | 当前环境     | base_url、api_key  |
-| 5      | 全局变量     | 全局         | 跨环境共享配置     |
+| 优先级 | 作用域    | 生命周期   | 典型用途             |
+|:--- |:------ |:------ |:---------------- |
+| 1   | 步骤变量   | 单次请求   | 临时覆盖、动态生成        |
+| 2   | 场景变量   | 场景执行期间 | 步骤间数据传递          |
+| 3   | 数据驱动变量 | 单次迭代   | CSV/JSON 数据行     |
+| 4   | 环境变量   | 当前环境   | base_url、api_key |
+| 5   | 全局变量   | 全局     | 跨环境共享配置          |
 
 **处理流程**：
 
@@ -636,13 +636,13 @@ text
 
 **支持的断言类型**：
 
-| 类型          | 说明             | 示例               |
-| :------------ | :--------------- | :----------------- |
-| status_code   | HTTP 状态码      | 期望: 200          |
+| 类型            | 说明             | 示例               |
+|:------------- |:-------------- |:---------------- |
+| status_code   | HTTP 状态码       | 期望: 200          |
 | json_path     | JSONPath 取值    | 路径: $.data.token |
-| response_time | 响应耗时         | 期望: < 1000ms     |
-| header        | 响应头           | 头名: Content-Type |
-| body_contains | 响应体包含文本   | 期望: "success"    |
+| response_time | 响应耗时           | 期望: < 1000ms     |
+| header        | 响应头            | 头名: Content-Type |
+| body_contains | 响应体包含文本        | 期望: "success"    |
 | schema        | JSON Schema 校验 | Schema 定义        |
 
 **断言结果结构**：
@@ -714,12 +714,12 @@ text
 
 **执行策略**：
 
-| 策略     | 说明                                       |
-| :------- | :----------------------------------------- |
-| 顺序执行 | 按 step_order 依次执行                     |
+| 策略   | 说明                                |
+|:---- |:--------------------------------- |
+| 顺序执行 | 按 step_order 依次执行                 |
 | 失败继续 | skip_on_failure = false 时，步骤失败仍继续 |
-| 失败重试 | 支持配置重试次数和间隔                     |
-| 变量隔离 | 每个场景独立的变量空间                     |
+| 失败重试 | 支持配置重试次数和间隔                       |
+| 变量隔离 | 每个场景独立的变量空间                       |
 
 ------
 
@@ -781,61 +781,61 @@ text
 
 #### 6.2.1 用例管理页
 
-| 功能区域   | 功能点          | 说明                        |
-| :--------- | :-------------- | :-------------------------- |
-| 左侧集合树 | 文件夹展开/折叠 | 树形展示用例组织结构        |
-|            | 新建文件夹/用例 | 右键菜单或底部按钮          |
-|            | 拖拽排序        | 支持用例在不同文件夹间移动  |
-|            | 右键菜单        | 重命名、删除、导出          |
-| 主内容区   | 用例列表        | 表格展示，支持排序、筛选    |
-|            | 快速执行        | 列表项悬浮显示执行按钮      |
-|            | 批量操作        | 批量删除、批量导出          |
-| 请求配置区 | 方法选择器      | GET/POST/PUT/DELETE/PATCH   |
-|            | URL 输入        | 支持变量提示和高亮          |
-|            | 参数编辑        | Headers/Params/Body 标签页  |
-|            | 认证配置        | Basic/Bearer/API Key        |
-| 断言配置区 | 断言列表        | 展示已配置的断言规则        |
-|            | 添加断言        | 弹窗选择断言类型            |
-|            | 启用/禁用       | 开关控制断言是否生效        |
-| 响应展示区 | 状态信息        | 状态码、耗时、大小          |
-|            | 响应体          | JSON 格式化高亮             |
-|            | 断言结果        | 展示每个断言的通过/失败状态 |
+| 功能区域  | 功能点      | 说明                        |
+|:----- |:-------- |:------------------------- |
+| 左侧集合树 | 文件夹展开/折叠 | 树形展示用例组织结构                |
+|       | 新建文件夹/用例 | 右键菜单或底部按钮                 |
+|       | 拖拽排序     | 支持用例在不同文件夹间移动             |
+|       | 右键菜单     | 重命名、删除、导出                 |
+| 主内容区  | 用例列表     | 表格展示，支持排序、筛选              |
+|       | 快速执行     | 列表项悬浮显示执行按钮               |
+|       | 批量操作     | 批量删除、批量导出                 |
+| 请求配置区 | 方法选择器    | GET/POST/PUT/DELETE/PATCH |
+|       | URL 输入   | 支持变量提示和高亮                 |
+|       | 参数编辑     | Headers/Params/Body 标签页   |
+|       | 认证配置     | Basic/Bearer/API Key      |
+| 断言配置区 | 断言列表     | 展示已配置的断言规则                |
+|       | 添加断言     | 弹窗选择断言类型                  |
+|       | 启用/禁用    | 开关控制断言是否生效                |
+| 响应展示区 | 状态信息     | 状态码、耗时、大小                 |
+|       | 响应体      | JSON 格式化高亮                |
+|       | 断言结果     | 展示每个断言的通过/失败状态            |
 
 #### 6.2.2 场景编排页
 
-| 功能区域   | 功能点    | 说明                   |
-| :--------- | :-------- | :--------------------- |
-| 场景列表   | 场景 CRUD | 新建、编辑、删除场景   |
-| 步骤编排区 | 添加步骤  | 从用例库选择添加       |
-|            | 步骤排序  | 拖拽调整执行顺序       |
-|            | 步骤配置  | 设置提取规则、失败处理 |
-| 执行控制   | 执行场景  | 运行整个场景           |
-|            | 单步执行  | 调试时逐步执行         |
-| 变量监控   | 变量面板  | 实时展示场景变量值     |
-| 执行报告   | 步骤结果  | 每个步骤的执行状态     |
-|            | 提取结果  | 展示提取的变量值       |
+| 功能区域  | 功能点     | 说明          |
+|:----- |:------- |:----------- |
+| 场景列表  | 场景 CRUD | 新建、编辑、删除场景  |
+| 步骤编排区 | 添加步骤    | 从用例库选择添加    |
+|       | 步骤排序    | 拖拽调整执行顺序    |
+|       | 步骤配置    | 设置提取规则、失败处理 |
+| 执行控制  | 执行场景    | 运行整个场景      |
+|       | 单步执行    | 调试时逐步执行     |
+| 变量监控  | 变量面板    | 实时展示场景变量值   |
+| 执行报告  | 步骤结果    | 每个步骤的执行状态   |
+|       | 提取结果    | 展示提取的变量值    |
 
 #### 6.2.3 环境管理页
 
-| 功能区域 | 功能点     | 说明                  |
-| :------- | :--------- | :-------------------- |
-| 环境列表 | 环境 CRUD  | 新建、编辑、删除环境  |
-|          | 设为默认   | 标记默认环境          |
-| 变量编辑 | 键值对编辑 | 表格形式编辑变量      |
-|          | 变量预览   | 实时预览替换效果      |
-| 导入导出 | 导出环境   | JSON 格式导出         |
-|          | 导入环境   | 支持 Postman 环境格式 |
+| 功能区域 | 功能点     | 说明              |
+|:---- |:------- |:--------------- |
+| 环境列表 | 环境 CRUD | 新建、编辑、删除环境      |
+|      | 设为默认    | 标记默认环境          |
+| 变量编辑 | 键值对编辑   | 表格形式编辑变量        |
+|      | 变量预览    | 实时预览替换效果        |
+| 导入导出 | 导出环境    | JSON 格式导出       |
+|      | 导入环境    | 支持 Postman 环境格式 |
 
 #### 6.2.4 执行历史页
 
-| 功能区域 | 功能点   | 说明                   |
-| :------- | :------- | :--------------------- |
-| 历史列表 | 分页表格 | 展示执行记录           |
-|          | 筛选条件 | 按状态、时间、类型筛选 |
-|          | 快速回放 | 一键重新执行           |
-| 执行详情 | 请求快照 | 展示发送的请求内容     |
-|          | 响应快照 | 展示收到的响应内容     |
-|          | 断言详情 | 每个断言的执行结果     |
+| 功能区域 | 功能点  | 说明          |
+|:---- |:---- |:----------- |
+| 历史列表 | 分页表格 | 展示执行记录      |
+|      | 筛选条件 | 按状态、时间、类型筛选 |
+|      | 快速回放 | 一键重新执行      |
+| 执行详情 | 请求快照 | 展示发送的请求内容   |
+|      | 响应快照 | 展示收到的响应内容   |
+|      | 断言详情 | 每个断言的执行结果   |
 | 对比功能 | 历史对比 | 两次执行结果的差异对比 |
 
 ------
@@ -946,12 +946,12 @@ text
 
 ### 8.2 数据映射关系
 
-| LocalStorage Key | 目标表        | 转换说明                       |
-| :--------------- | :------------ | :----------------------------- |
+| LocalStorage Key | 目标表           | 转换说明                  |
+|:---------------- |:------------- |:--------------------- |
 | collections      | test_case     | 解析集合结构，生成 folder_path |
-| environments     | environment   | 直接映射                       |
-| history          | execution_log | 仅导入最近 N 条                |
-| settings         | 配置文件      | 部分保留                       |
+| environments     | environment   | 直接映射                  |
+| history          | execution_log | 仅导入最近 N 条             |
+| settings         | 配置文件          | 部分保留                  |
 
 ------
 
@@ -1084,24 +1084,26 @@ cli/
 
 ### 10.1 四周计划
 
-| 周次       | 主题       | 核心交付物              | 验收标准                       |
-| :--------- | :--------- | :---------------------- | :----------------------------- |
-| **Week 1** | 数据持久化 | SQLite 集成 + 用例 CRUD | 数据可保存到数据库，刷新不丢失 |
-| **Week 2** | 环境与断言 | 环境管理 + 断言引擎     | 环境切换变量生效，断言自动校验 |
-| **Week 3** | 场景编排   | 场景 CRUD + 步骤编排    | 多用例串联执行，变量正确传递   |
+| 周次         | 主题      | 核心交付物               | 验收标准            |
+|:---------- |:------- |:------------------- |:--------------- |
+| **Week 1** | 数据持久化   | SQLite 集成 + 用例 CRUD | 数据可保存到数据库，刷新不丢失 |
+| **Week 2** | 环境与断言   | 环境管理 + 断言引擎         | 环境切换变量生效，断言自动校验 |
+| **Week 3** | 场景编排    | 场景 CRUD + 步骤编排      | 多用例串联执行，变量正确传递  |
 | **Week 4** | CLI 与集成 | CLI 工具 + JUnit 报告   | 命令行可执行测试，输出标准报告 |
 
 ### 10.2 验收清单
 
-| 序号 | 验收项             | 验收方式          |
-| :--- | :----------------- | :---------------- |
-| 1    | 用例 CRUD 功能完整 | 手动测试          |
-| 2    | 文件夹树形组织正常 | 手动测试          |
-| 3    | 环境变量替换正确   | 编写测试用例验证  |
-| 4    | 断言功能准确       | 编写测试用例验证  |
-| 5    | 场景编排功能正常   | 编写示例场景验证  |
-| 6    | 变量提取与传递正确 | 场景执行验证      |
-| 7    | CLI 可执行用例     | 命令行验证        |
-| 8    | JUnit 报告格式正确 | CI 工具验证       |
-| 9    | 历史数据可迁移     | 导入导出验证      |
-| 10   | API 文档完整       | Swagger UI 可访问 |
+| 序号  | 验收项 | 验收方式           |
+|:--- |:------------------------------- |:-------------- |
+| 1   | 用例 CRUD 功能完整                    | 手动测试           |
+| 2   | 文件夹树形组织正常                       | 手动测试           |
+| 3   | 环境变量替换正确                        | 编写测试用例验证       |
+| 4   | 断言功能准确                          | 编写测试用例验证       |
+| 5   | 场景编排功能正常                        | 编写示例场景验证       |
+| 6   | 变量提取与传递正确                       | 场景执行验证         |
+| 7   | CLI 可执行用例                       | 命令行验证          |
+| 8   | JUnit 报告格式正确                    | CI 工具验证        |
+| 9   | 历史数据可迁移                         | 导入导出验证         |
+| 10  | API 文档完整                        | Swagger UI 可访问 |
+
+

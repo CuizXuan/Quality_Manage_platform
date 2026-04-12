@@ -4,13 +4,13 @@
     <div class="toolbar">
       <div class="toolbar-left">
         <h2 class="page-title">
-          <span class="prompt">&gt;</span> CASE MANAGEMENT
+          <span class="prompt">&gt;</span> 用例管理
         </h2>
       </div>
       <div class="toolbar-right">
-        <input v-model="keyword" placeholder="SEARCH_CASES..." class="search-input" @input="debounceSearch" />
+        <input v-model="keyword" placeholder="搜索用例..." class="search-input" @input="debounceSearch" />
         <button class="btn primary" @click="showCreateModal = true">
-          <span>+</span> NEW CASE
+          <span>+</span> 新建用例
         </button>
       </div>
     </div>
@@ -20,7 +20,7 @@
       <!-- 左侧文件夹树 -->
       <div class="folder-tree panel">
         <div class="panel-header">
-          <span class="panel-title">// COLLECTIONS</span>
+          <span class="panel-title">// 分类</span>
         </div>
         <div
           class="tree-item root"
@@ -28,7 +28,7 @@
           @click="selectFolder('/')"
         >
           <span class="folder-icon">◈</span>
-          ALL CASES ({{ cases.length }})
+          全部用例 ({{ cases.length }})
         </div>
         <div v-for="folder in folderList" :key="folder.path"
           class="tree-item"
@@ -43,21 +43,21 @@
       <!-- 用例列表 -->
       <div class="case-list panel">
         <div class="panel-header">
-          <span class="panel-title">// CASE LIST</span>
+          <span class="panel-title">// 用例列表</span>
         </div>
         <div v-if="loading" class="loading">
           <span class="loading-spinner">⟳</span>
-          <span>LOADING...</span>
+          <span>加载中...</span>
         </div>
         <div v-else-if="filteredCases.length === 0" class="empty">
-          <span class="glitch">// NO DATA FOUND</span>
+          <span class="glitch">// 暂无数据</span>
         </div>
         <div v-else class="case-table">
           <div class="table-header">
-            <span class="col-method">METHOD</span>
-            <span class="col-name">NAME</span>
-            <span class="col-path">PATH</span>
-            <span class="col-actions">ACTIONS</span>
+            <span class="col-method">方法</span>
+            <span class="col-name">名称</span>
+            <span class="col-path">路径</span>
+            <span class="col-actions">操作</span>
           </div>
           <div v-for="c in filteredCases" :key="c.id" class="table-row" @click="openCase(c)">
             <span class="col-method">
@@ -79,38 +79,38 @@
     <div v-if="showCreateModal" class="modal-overlay" @click.self="showCreateModal = false">
       <div class="modal">
         <div class="modal-header">
-          <h3>{{ editingCase ? '// EDIT CASE' : '// NEW CASE' }}</h3>
+          <h3>{{ editingCase ? '// 编辑用例' : '// 新建用例' }}</h3>
           <button class="btn-close" @click="showCreateModal = false">×</button>
         </div>
         <div class="form-body">
           <div class="form-group">
-            <label>NAME</label>
+            <label>名称</label>
             <input v-model="form.name" placeholder="用例名称" />
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>METHOD</label>
+              <label>请求方法</label>
               <select v-model="form.method">
                 <option v-for="m in ['GET','POST','PUT','DELETE','PATCH']" :key="m" :value="m">{{ m }}</option>
               </select>
             </div>
             <div class="form-group flex-1">
-              <label>URL</label>
+              <label>请求地址</label>
               <input v-model="form.url" placeholder="https://api.example.com/path" />
             </div>
           </div>
           <div class="form-group">
-            <label>FOLDER_PATH</label>
+            <label>所属分类</label>
             <input v-model="form.folder_path" placeholder="/用户模块/登录" />
           </div>
           <div class="form-group">
-            <label>DESCRIPTION</label>
+            <label>描述</label>
             <textarea v-model="form.description" rows="2" placeholder="用例描述..."></textarea>
           </div>
         </div>
         <div class="form-actions">
-          <button class="btn" @click="showCreateModal = false">CANCEL</button>
-          <button class="btn primary" @click="saveCase">{{ editingCase ? 'SAVE' : 'CREATE' }}</button>
+          <button class="btn" @click="showCreateModal = false">取消</button>
+          <button class="btn primary" @click="saveCase">{{ editingCase ? '保存' : '创建' }}</button>
         </div>
       </div>
     </div>
@@ -446,6 +446,12 @@ onMounted(() => {
   max-height: 80vh;
   overflow-y: auto;
   clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+}
+
+/* 禁用 panel 角落装饰（这些装饰在模态框中不需要） */
+.modal::before,
+.modal::after {
+  display: none;
 }
 
 .modal-header {

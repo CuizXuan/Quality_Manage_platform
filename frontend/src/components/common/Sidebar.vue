@@ -49,11 +49,16 @@
           class="collection-item"
         >
           <div class="collection-header" @click="toggleCollection(col.id)">
-            <span class="expand-icon">{{ expandedCollections.includes(col.id) ? '📂' : '📁' }}</span>
+            <span class="expand-icon">{{ isExpanded(col.id) ? '📂' : '📁' }}</span>
             <span class="col-name">{{ col.name }}</span>
             <span class="col-count">[{{ col.requests.length }}]</span>
+            <button
+              class="col-delete-btn"
+              @click.stop="deleteCollection(col.id)"
+              title="删除集合"
+            >✕</button>
           </div>
-          <div v-show="expandedCollections.includes(col.id)" class="request-list">
+          <div v-show="isExpanded(col.id)" class="request-list">
             <div
               v-for="req in col.requests"
               :key="req.id"
@@ -64,6 +69,11 @@
                 {{ req.method }}
               </span>
               <span class="request-name">{{ req.name || req.url }}</span>
+              <button
+                class="req-delete-btn"
+                @click.stop="removeRequest(col.id, req.id)"
+                title="删除请求"
+              >✕</button>
             </div>
             <div v-if="col.requests.length === 0" class="empty-tip">
               -- EMPTY --
@@ -148,6 +158,10 @@ const filteredHistory = computed(() => {
   return historyStore.getFiltered({ keyword: historyKeyword.value })
 })
 
+function isExpanded(id) {
+  return expandedCollections.value.includes(id)
+}
+
 function toggleCollection(id) {
   const idx = expandedCollections.value.indexOf(id)
   if (idx >= 0) {
@@ -155,6 +169,19 @@ function toggleCollection(id) {
   } else {
     expandedCollections.value.push(id)
   }
+}
+
+function deleteCollection(id) {
+  if (confirm('确定删除该集合？')) {
+    collectionStore.deleteCollection(id)
+    // 从展开列表中移除
+    const idx = expandedCollections.value.indexOf(id)
+    if (idx >= 0) expandedCollections.value.splice(idx, 1)
+  }
+}
+
+function removeRequest(colId, reqId) {
+  collectionStore.removeRequest(colId, reqId)
 }
 
 function createCollection() {
@@ -379,6 +406,41 @@ function getStatusClass(code) {
 .col-count {
   font-size: 10px;
   color: var(--text-secondary);
+  margin-left: auto;
+}
+
+.col-delete-btn,
+.req-delete-btn {
+  width: 18px;
+  height: 18px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: var(--text-secondary);
+  font-size: 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+  margin-left: 4px;
+}
+
+.collection-header:hover .col-delete-btn,
+.request-item:hover .req-delete-btn {
+  display: flex;
+}
+
+.col-delete-btn:hover {
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+  box-shadow: 0 0 8px rgba(255, 71, 87, 0.4);
+}
+
+.req-delete-btn:hover {
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
 }
 
 .request-item {
@@ -391,6 +453,7 @@ function getStatusClass(code) {
   font-size: 11px;
   border-left: 2px solid transparent;
   transition: all var(--transition-fast);
+  position: relative;
 }
 
 .request-item:hover {

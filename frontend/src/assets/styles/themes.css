@@ -300,7 +300,6 @@ h1, h2, h3, h4, h5, h6 {
   height: 20px;
   border-top: 2px solid var(--neon-cyan);
   border-right: 2px solid var(--neon-cyan);
-  box-shadow: var(--glow-cyan);
 }
 
 .theme-light .panel::after {

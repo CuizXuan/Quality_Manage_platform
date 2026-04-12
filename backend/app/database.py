@@ -2,8 +2,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import os
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./data/api_debug.db")
-DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
+# 计算 backend 目录的绝对路径
+BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR = os.path.join(BACKEND_DIR, "data")
+DB_PATH = os.path.join(DATA_DIR, "api_debug.db")
+
+# 默认使用绝对路径
+DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{DB_PATH}")
 
 os.makedirs(DATA_DIR, exist_ok=True)
 

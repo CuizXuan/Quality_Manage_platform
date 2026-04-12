@@ -1,24 +1,31 @@
 <template>
   <div class="app-layout" :class="themeClass">
-    <DigitalRain v-if="isDark" />
-    <AppHeader :is-dark="isDark" @toggle-theme="toggleTheme" />
-    <div class="app-body">
-      <Sidebar :is-dark="isDark" @load-request="onLoadRequest" />
-      <main class="app-main">
-        <router-view />
-      </main>
-    </div>
-    <StatusBar />
+    <template v-if="showAppLayout">
+      <DigitalRain v-if="isDark" />
+      <AppHeader :is-dark="isDark" @toggle-theme="toggleTheme" />
+      <div class="app-body">
+        <Sidebar v-if="showSidebar" :is-dark="isDark" @load-request="onLoadRequest" />
+        <main class="app-main" :class="{ 'no-sidebar': !showSidebar }">
+          <router-view />
+        </main>
+      </div>
+      <StatusBar />
+    </template>
+    <template v-else>
+      <router-view />
+    </template>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import AppHeader from './components/common/AppHeader.vue'
 import Sidebar from './components/common/Sidebar.vue'
 import StatusBar from './components/common/StatusBar.vue'
 import DigitalRain from './components/common/DigitalRain.vue'
 
+const route = useRoute()
 const isDark = ref(true)
 
 onMounted(() => {
@@ -26,8 +33,16 @@ onMounted(() => {
   if (saved !== null) {
     isDark.value = saved === 'dark'
   }
-  // Apply theme class to html element
   updateThemeClass()
+})
+
+// 控制是否显示侧边栏
+const SIDEBAR_ROUTES = ['Dashboard', 'Cases', 'Scenarios', 'Environments', 'History', 'Datasets', 'Schedules', 'MockRules', 'Reports', 'Repositories', 'Defects', 'QualityGates', 'Projects', 'Users', 'TeamManage', 'AssetCenter', 'AILab', 'TrafficLoadTest', 'ChaosStudio', 'TestDataFactory']
+const showSidebar = computed(() => SIDEBAR_ROUTES.includes(route.name))
+
+// 控制是否显示应用布局（登录页不显示）
+const showAppLayout = computed(() => {
+  return route.name !== 'Login'
 })
 
 function updateThemeClass() {
@@ -53,6 +68,11 @@ const themeClass = computed(() => {
 function onLoadRequest() {
   // Sidebar 加载请求后，可以在这里做后续处理
 }
+
+// 监听路由变化
+watch(route, () => {
+  updateThemeClass()
+})
 </script>
 
 <style>
@@ -78,5 +98,9 @@ function onLoadRequest() {
   margin-left: var(--sidebar-width);
   overflow-y: auto;
   padding: 16px;
+}
+
+.app-main.no-sidebar {
+  margin-left: 0;
 }
 </style>

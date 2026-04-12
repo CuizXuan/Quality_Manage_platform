@@ -51,6 +51,7 @@ class Drop {
 }
 
 function init(canvas) {
+  if (!canvas) return
   const width = canvas.width = window.innerWidth
   const height = canvas.height = window.innerHeight
   ctx = canvas.getContext('2d')

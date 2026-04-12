@@ -117,6 +117,12 @@ function clear() {
   margin-bottom: 12px;
   overflow: hidden;
 }
+
+/* 禁用 panel 角落装饰 */
+.request-parser::before,
+.request-parser::after {
+  display: none;
+}
 .parser-header {
   display: flex;
   justify-content: space-between;
