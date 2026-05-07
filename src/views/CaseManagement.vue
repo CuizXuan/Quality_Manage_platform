@@ -9,6 +9,17 @@
       </div>
       <div class="toolbar-right">
         <input v-model="keyword" placeholder="搜索用例..." class="search-input" @input="debounceSearch" />
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <el-select v-model="sortBy" style="width: 130px" @change="debounceSearch">
+            <el-option label="按名称" value="name" />
+            <el-option label="按创建时间" value="created_at" />
+            <el-option label="按ID" value="id" />
+          </el-select>
+          <el-select v-model="sortOrder" style="width: 100px" @change="debounceSearch">
+            <el-option label="↓ 降序" value="desc" />
+            <el-option label="↑ 升序" value="asc" />
+          </el-select>
+        </div>
         <button class="btn primary" @click="showCreateModal = true">
           <span>+</span> 新建用例
         </button>
@@ -60,6 +71,7 @@
             <span class="col-method">方法</span>
             <span class="col-name">名称</span>
             <span class="col-path">路径</span>
+            <span class="col-time">创建时间</span>
             <span class="col-actions">操作</span>
           </div>
           <div v-for="c in filteredCases" :key="c.id" class="table-row" @click="openCase(c)">
@@ -68,6 +80,7 @@
             </span>
             <span class="col-name">{{ c.name }}</span>
             <span class="col-path">{{ c.folder_path }}</span>
+            <span class="col-time">{{ formatDate(c.created_at) }}</span>
             <span class="col-actions" @click.stop>
               <button class="icon-btn" :class="{ loading: runningCaseId === c.id }" :disabled="runningCaseId === c.id" title="执行" @click="runCase(c)">
                 <span v-if="runningCaseId === c.id" class="loading-spinner">⟳</span>
@@ -164,6 +177,8 @@ const { cases, loading, fetchError } = storeToRefs(caseStore)
 
 const keyword = ref('')
 const selectedFolder = ref('/')
+const sortBy = ref('created_at')
+const sortOrder = ref('desc')
 const showCreateModal = ref(false)
 const editingCase = ref(null)
 const form = ref(defaultForm())
@@ -236,11 +251,19 @@ function selectFolder(path) {
   selectedFolder.value = path
 }
 
+function formatDate(dateStr) {
+  if (!dateStr) return '-'
+  return new Date(dateStr).toLocaleString('zh-CN', {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit'
+  })
+}
+
 let searchTimer = null
 function debounceSearch() {
   clearTimeout(searchTimer)
   searchTimer = setTimeout(() => {
-    caseStore.fetchCases({ keyword: keyword.value })
+    caseStore.fetchCases({ keyword: keyword.value, sort_by: sortBy.value, order: sortOrder.value })
   }, 300)
 }
 
@@ -572,6 +595,7 @@ onActivated(() => {
 .col-method { width: 90px; }
 .col-name { flex: 1; }
 .col-path { width: 160px; color: var(--text-secondary); font-size: 11px; }
+.col-time { width: 160px; color: var(--text-secondary); font-size: 11px; }
 .col-actions { width: 120px; display: flex; gap: 4px; }
 
 .icon-btn {
