@@ -1155,7 +1155,7 @@ h1.main-title {
 }
 
 .toggle-password {
-  display: flex;
+  display: none; /* 隐藏自定义眼睛按钮，保留浏览器默认的 */
   align-items: center;
   justify-content: center;
   padding: 0 12px;
