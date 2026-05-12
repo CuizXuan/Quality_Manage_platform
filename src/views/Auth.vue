@@ -94,11 +94,12 @@
       <canvas id="log-particles" class="log-particles-canvas"></canvas>
 
       <div class="log-stream">
-        <div class="log-label">Activity</div>
+        <div class="log-label">AI Runtime</div>
         <div class="log-list">
           <div class="log-item" v-for="(log, i) in displayedLogs" :key="i" :style="{ animationDelay: i * 0.1 + 's' }">
-            <span class="log-indicator" :style="{ background: log.color, boxShadow: `0 0 6px ${log.color}80` }"></span>
-            <span class="log-text" :style="{ color: log.color }">{{ log.text }}</span>
+            <span class="log-dot" :style="{ background: STATUS_COLORS[log.status], boxShadow: `0 0 8px ${STATUS_COLORS[log.status]}35` }"></span>
+            <span class="log-text">{{ log.text }}</span>
+            <span class="status-pill" :style="{ background: `${STATUS_COLORS[log.status]}20`, color: STATUS_COLORS[log.status] }">{{ log.status }}</span>
           </div>
         </div>
       </div>
@@ -292,14 +293,22 @@ const registerForm = ref({
   confirmPassword: ''
 })
 
+// 颜色系统: ERROR=#FF6B6B / SUCCESS=#22C55E / INFO=#5B8CFF / WARNING=#F59E0B
+const STATUS_COLORS = {
+  ERROR: '#FF6B6B',
+  SUCCESS: '#22C55E',
+  INFO: '#5B8CFF',
+  WARNING: '#F59E0B'
+}
+
 const logs = [
-  { text: '回归测试已完成', color: 'rgba(82, 196, 26, 0.85)' },
-  { text: 'AI 检测到异常', color: 'rgba(255, 77, 79, 0.85)' },
-  { text: '覆盖率: 92%', color: 'rgba(91, 140, 255, 0.85)' },
-  { text: '风险等级: 低', color: 'rgba(82, 196, 26, 0.85)' },
-  { text: 'AI 推荐已生成', color: 'rgba(0, 212, 255, 0.85)' },
-  { text: '自动化流程运行中', color: 'rgba(91, 140, 255, 0.85)' },
-  { text: '测试套件已优化', color: 'rgba(124, 77, 255, 0.85)' }
+  { text: '回归测试已完成', status: 'SUCCESS' },
+  { text: 'AI 检测到异常', status: 'ERROR' },
+  { text: '覆盖率 92%', status: 'INFO' },
+  { text: '风险等级：低', status: 'SUCCESS' },
+  { text: 'AI 推荐已生成', status: 'INFO' },
+  { text: '自动化流程运行中', status: 'INFO' },
+  { text: '测试套件已优化', status: 'SUCCESS' }
 ]
 
 const currentLogIndex = ref(0)
@@ -868,33 +877,40 @@ h1.main-title {
   z-index: 2;
 }
 
-/* 日志流 */
+/* 日志流 - AI Runtime Feed */
 .log-stream {
   position: absolute;
-  bottom: 80px;
-  left: 80px;
+  bottom: 60px;
+  left: 60px;
   z-index: 3;
+  padding-left: 16px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .log-label {
-  font-size: 10px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.3);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: lowercase;
+  letter-spacing: .12em;
+  color: rgba(255, 255, 255, 0.32);
+  margin-bottom: 16px;
+  font-family: 'Inter', sans-serif;
 }
 
 .log-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .log-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.78);
   opacity: 0;
   animation: logFadeIn 0.5s ease forwards;
 }
@@ -904,18 +920,25 @@ h1.main-title {
   to { opacity: 1; transform: translateX(0); }
 }
 
-.log-indicator {
+.log-dot {
   width: 6px;
   height: 6px;
-  border-radius: 50%;
-  background: rgba(91, 140, 255, 0.6);
-  box-shadow: 0 0 6px rgba(91, 140, 255, 0.4);
+  border-radius: 999px;
+  flex-shrink: 0;
 }
 
 .log-text {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 12px;
-  font-family: 'Inter', monospace;
+  flex: 1;
+}
+
+.status-pill {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  flex-shrink: 0;
 }
 
 /* Force override global input styles - highest priority */
