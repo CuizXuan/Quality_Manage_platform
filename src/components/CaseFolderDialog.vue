@@ -62,6 +62,8 @@ async function submit() {
   }
 }
 
-const emit = defineEmits(['refresh'])
+const emit = defineEmits<{
+  (e: 'refresh'): void
+}>()
 defineExpose({ open })
 </script>

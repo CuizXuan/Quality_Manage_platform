@@ -35,8 +35,15 @@ export const useAuthStore = defineStore('auth', () => {
       })
       
       if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.detail || '登录失败')
+        let errMsg = '请求失败'
+        try {
+          const data = await response.json()
+          errMsg = data.detail || data.message || errMsg
+        } catch {
+          // 非 JSON 响应（text/plain），直接用 status text
+          errMsg = response.statusText || errMsg
+        }
+        throw new Error(errMsg)
       }
       
       const data = await response.json()
@@ -72,8 +79,15 @@ export const useAuthStore = defineStore('auth', () => {
       })
       
       if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.detail || '注册失败')
+        let errMsg = '请求失败'
+        try {
+          const data = await response.json()
+          errMsg = data.detail || data.message || errMsg
+        } catch {
+          // 非 JSON 响应（text/plain），直接用 status text
+          errMsg = response.statusText || errMsg
+        }
+        throw new Error(errMsg)
       }
       
       const data = await response.json()

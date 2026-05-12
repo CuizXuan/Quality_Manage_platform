@@ -92,9 +92,9 @@
               placeholder="例如：USER_SVC"
               required
               maxlength="20"
-              pattern="[A-Za-z0-9]+"
+              pattern="[A-Za-z0-9_]+"
             />
-            <small>只能包含字母和数字，最多20字符</small>
+            <small>只能包含字母、数字和下划线，最多20字符</small>
           </div>
           <div class="form-group">
             <label>描述</label>
@@ -120,8 +120,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
+const router = useRouter()
 const authStore = useAuthStore()
 
 const API_BASE = '/api'
@@ -207,7 +209,8 @@ async function handleCreate() {
 }
 
 function goToProject(project) {
-  alert(`项目: ${project.name}`)
+  // 跳转到项目详情页（后续可扩展为 /projects/:id）
+  router.push({ name: 'Projects' })
 }
 
 onMounted(() => {

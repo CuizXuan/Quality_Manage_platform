@@ -81,6 +81,7 @@ const popoverRef = ref(null)
 const visible = ref(false)
 const popoverStyle = ref({})
 const placementClass = ref('')
+let isUnmounted = false
 
 // Ant Design Popconfirm-style positioning with viewport boundary detection
 function getPopoverPosition() {
@@ -148,49 +149,48 @@ function updatePosition() {
 watch(visible, (val) => {
   if (val) {
     nextTick(() => {
-      if (popoverRef.value) {
-        const rect = wrapperRef.value.getBoundingClientRect()
-        const popRect = popoverRef.value.getBoundingClientRect()
-        const viewportWidth = window.innerWidth
-        const viewportHeight = window.innerHeight
-        const offset = 8
+      if (isUnmounted || !popoverRef.value || !wrapperRef.value) return
+      const rect = wrapperRef.value.getBoundingClientRect()
+      const popRect = popoverRef.value.getBoundingClientRect()
+      const viewportWidth = window.innerWidth
+      const viewportHeight = window.innerHeight
+      const offset = 8
 
-        let top, left
-        let placement = 'bottom'
+      let top, left
+      let placement = 'bottom'
 
-        const spaceRight = viewportWidth - rect.right
-        const spaceBelow = viewportHeight - rect.bottom
-        const spaceAbove = rect.top
+      const spaceRight = viewportWidth - rect.right
+      const spaceBelow = viewportHeight - rect.bottom
+      const spaceAbove = rect.top
 
-        const actualWidth = popRect.width || 260
-        const actualHeight = popRect.height || 140
+      const actualWidth = popRect.width || 260
+      const actualHeight = popRect.height || 140
 
-        // Horizontal
-        if (rect.left + actualWidth <= viewportWidth - 8) {
-          left = rect.left
-        } else if (spaceRight >= actualWidth) {
-          left = rect.right
-        } else {
-          left = Math.max(8, viewportWidth - actualWidth - 8)
-        }
+      // Horizontal
+      if (rect.left + actualWidth <= viewportWidth - 8) {
+        left = rect.left
+      } else if (spaceRight >= actualWidth) {
+        left = rect.right
+      } else {
+        left = Math.max(8, viewportWidth - actualWidth - 8)
+      }
 
-        // Vertical
-        if (spaceBelow >= actualHeight + offset) {
-          top = rect.bottom + offset
-        } else if (spaceAbove >= actualHeight + offset) {
-          top = rect.top - actualHeight - offset
-          placement = 'top'
-        } else {
-          top = rect.bottom + offset
-        }
+      // Vertical
+      if (spaceBelow >= actualHeight + offset) {
+        top = rect.bottom + offset
+      } else if (spaceAbove >= actualHeight + offset) {
+        top = rect.top - actualHeight - offset
+        placement = 'top'
+      } else {
+        top = rect.bottom + offset
+      }
 
-        placementClass.value = `placement-${placement}`
-        popoverStyle.value = {
-          position: 'fixed',
-          top: `${top}px`,
-          left: `${left}px`,
-          zIndex: 99999,
-        }
+      placementClass.value = `placement-${placement}`
+      popoverStyle.value = {
+        position: 'fixed',
+        top: `${top}px`,
+        left: `${left}px`,
+        zIndex: 99999,
       }
     })
   }
@@ -224,7 +224,7 @@ function handleCancel() {
 }
 
 function onDocumentMousedown(e) {
-  if (!wrapperRef.value) return
+  if (!wrapperRef.value) return close()
   if (!wrapperRef.value.contains(e.target)) {
     close()
   }
@@ -252,6 +252,13 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  isUnmounted = true
+  // 强制立即关闭弹窗，防止 parentNode null 错误
+  // 当父组件 DOM 被移除时（如删除列表项），Transition 还在执行 leave 动画
+  // 此时 popover 已脱离 DOM，强行触发动画完成避免 parentNode 报错
+  if (visible.value) {
+    visible.value = false
+  }
   document.removeEventListener('mousedown', onDocumentMousedown)
   document.removeEventListener('keydown', onDocumentKeydown)
   window.removeEventListener('scroll', onWindowScroll, true)

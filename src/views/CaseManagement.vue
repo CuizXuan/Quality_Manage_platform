@@ -26,10 +26,13 @@
       </div>
     </div>
 
-    <!-- 文件夹树 + 用例列表 -->
-    <div class="content">
-      <!-- 左侧文件夹树 -->
-      <div class="folder-tree panel">
+    <!-- Tab 切换：用例列表 / 分类管理 -->
+    <el-tabs v-model="activeTab" class="content-tabs">
+      <el-tab-pane label="用例列表" name="cases">
+        <!-- 文件夹树 + 用例列表 -->
+        <div class="content">
+          <!-- 左侧文件夹树 -->
+          <div class="folder-tree panel">
         <div class="panel-header">
           <span class="panel-title">// 分类</span>
         </div>
@@ -106,8 +109,13 @@
             </span>
           </div>
         </div>
-      </div>
-    </div>
+        </div>
+        </div>
+      </el-tab-pane>
+      <el-tab-pane label="分类管理" name="folders">
+        <CaseFolderManager />
+      </el-tab-pane>
+    </el-tabs>
 
     <!-- 新建/编辑弹窗 -->
     <div v-if="showCreateModal" class="case-modal-overlay" @click.self="showCreateModal = false">
@@ -166,6 +174,8 @@ import { ElMessageBox, ElMessage } from 'element-plus'
 import { useCaseStore } from '../stores/caseStore'
 import { useRequestStore } from '../stores/request'
 import { storeToRefs } from 'pinia'
+import CaseFolderManager from '@/components/CaseFolderManager.vue'
+import CyberConfirm from '@/components/common/CyberConfirm.vue'
 
 const router = useRouter()
 
@@ -176,6 +186,7 @@ const requestStore = useRequestStore()
 const { cases, loading, fetchError } = storeToRefs(caseStore)
 
 const keyword = ref('')
+const activeTab = ref('cases')
 const selectedFolder = ref('/')
 const sortBy = ref('created_at')
 const sortOrder = ref('desc')
@@ -479,6 +490,21 @@ onActivated(() => {
   display: flex;
   gap: 16px;
   overflow: hidden;
+}
+
+.content-tabs {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-tabs .el-tabs__content {
+  flex: 1;
+  overflow: hidden;
+}
+
+.content-tabs .el-tab-pane {
+  height: 100%;
 }
 
 .folder-tree {
