@@ -217,27 +217,26 @@ function saveToCollection() {
 .method-select {
   width: 110px;
   padding: 10px 12px;
-  background: var(--bg-secondary);
+  background: var(--bg-card);
   border: 1px solid var(--border-default);
-  font-family: var(--font-title);
+  font-family: var(--font-body);
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-weight: 600;
   cursor: pointer;
   outline: none;
   transition: all var(--transition-fast);
+  border-radius: var(--radius-sm);
 }
 
 .method-select:focus {
-  border-color: var(--neon-cyan);
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  border-color: var(--primary);
 }
 
-.method-select.method-get { color: var(--neon-cyan); border-color: var(--neon-cyan); }
-.method-select.method-post { color: var(--neon-green); border-color: var(--neon-green); }
-.method-select.method-put { color: var(--neon-orange); border-color: var(--neon-orange); }
-.method-select.method-delete { color: #f00; border-color: #f00; }
-.method-select.method-patch { color: var(--neon-pink); border-color: var(--neon-pink); }
+.method-select.method-get { color: var(--method-get); }
+.method-select.method-post { color: var(--method-post); }
+.method-select.method-put { color: var(--method-put); }
+.method-select.method-delete { color: var(--method-delete); }
+.method-select.method-patch { color: var(--method-patch); }
 
 .url-input-wrapper {
   flex: 1;
@@ -250,21 +249,21 @@ function saveToCollection() {
   padding-left: 30px;
   font-family: var(--font-mono);
   font-size: 13px;
-  background: var(--bg-secondary);
+  background: var(--bg-card);
   border: 1px solid var(--border-default);
-  color: var(--neon-cyan);
+  color: var(--text-primary);
   outline: none;
   transition: all var(--transition-fast);
+  border-radius: var(--radius-sm);
 }
 
 .url-input:focus {
-  border-color: var(--neon-cyan);
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3), inset 0 0 15px rgba(0, 255, 255, 0.05);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-muted);
 }
 
 .url-input::placeholder {
-  color: rgba(0, 255, 255, 0.3);
-  letter-spacing: 1px;
+  color: var(--text-tertiary);
 }
 
 .url-prefix {
@@ -272,9 +271,7 @@ function saveToCollection() {
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--neon-magenta);
-  font-weight: bold;
-  animation: blink 1s infinite;
+  color: var(--secondary);
 }
 
 .send-btn {
@@ -282,39 +279,22 @@ function saveToCollection() {
   align-items: center;
   gap: 8px;
   padding: 10px 24px;
-  background: var(--neon-cyan);
-  border: 1px solid var(--neon-cyan);
-  color: var(--bg-primary);
-  font-family: var(--font-title);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 2px;
+  background: var(--primary);
+  border: none;
+  color: white;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
   position: relative;
   overflow: hidden;
   transition: all var(--transition-fast);
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-}
-
-.send-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  transition: left 0.5s;
-}
-
-.send-btn:hover:not(:disabled)::before {
-  left: 100%;
+  border-radius: var(--radius-md);
 }
 
 .send-btn:hover:not(:disabled) {
-  background: transparent;
-  color: var(--neon-cyan);
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5), inset 0 0 20px rgba(0, 255, 255, 0.1);
+  background: var(--primary-hover);
+  box-shadow: var(--shadow-md);
 }
 
 .send-btn:disabled {
@@ -323,8 +303,7 @@ function saveToCollection() {
 }
 
 .send-btn.loading {
-  background: var(--neon-magenta);
-  border-color: var(--neon-magenta);
+  background: var(--secondary);
 }
 
 .loading-icon {
@@ -336,28 +315,25 @@ function saveToCollection() {
   to { transform: rotate(360deg); }
 }
 
-.send-icon {
-  text-shadow: 0 0 5px currentColor;
-}
-
 .save-btn {
   width: 44px;
   height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
+  background: var(--bg-card);
   border: 1px solid var(--border-default);
   color: var(--text-secondary);
   font-size: 16px;
   cursor: pointer;
   transition: all var(--transition-fast);
+  border-radius: var(--radius-sm);
 }
 
 .save-btn:hover {
-  border-color: var(--neon-cyan);
-  color: var(--neon-cyan);
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+  background: var(--bg-card-hover);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
 }
 
 .save-dialog-overlay {
@@ -366,7 +342,7 @@ function saveToCollection() {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -375,20 +351,20 @@ function saveToCollection() {
 }
 
 .modal {
-  background: var(--bg-panel);
-  border: 1px solid var(--neon-cyan);
-  box-shadow: 0 0 30px rgba(0, 255, 255, 0.3), inset 0 0 60px rgba(0, 255, 255, 0.05);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-xl);
   padding: 24px;
   width: 420px;
-  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  border-radius: var(--radius-xl);
 }
 
 .modal-title {
-  font-family: var(--font-title);
-  font-size: 14px;
+  font-family: var(--font-body);
+  font-size: 16px;
   font-weight: 600;
-  color: var(--neon-cyan);
-  letter-spacing: 2px;
+  color: var(--text-primary);
   margin-bottom: 20px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--border-default);
@@ -404,10 +380,9 @@ function saveToCollection() {
 
 .form-group label {
   display: block;
-  font-family: var(--font-title);
-  font-size: 10px;
+  font-family: var(--font-body);
+  font-size: 12px;
   color: var(--text-secondary);
-  letter-spacing: 1px;
   margin-bottom: 6px;
 }
 
@@ -415,18 +390,20 @@ function saveToCollection() {
 .form-group select {
   width: 100%;
   padding: 10px 12px;
-  background: var(--bg-secondary);
+  background: var(--bg-card);
   border: 1px solid var(--border-default);
-  color: var(--neon-cyan);
-  font-family: var(--font-mono);
-  font-size: 12px;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 13px;
   outline: none;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
 }
 
 .form-group input:focus,
 .form-group select:focus {
-  border-color: var(--neon-cyan);
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-muted);
 }
 
 .dialog-actions {
@@ -436,31 +413,31 @@ function saveToCollection() {
 }
 
 .btn {
-  font-family: var(--font-title);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 1px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
   padding: 8px 16px;
-  background: transparent;
+  background: var(--bg-card);
   border: 1px solid var(--border-default);
   color: var(--text-secondary);
   cursor: pointer;
   transition: all var(--transition-fast);
+  border-radius: var(--radius-sm);
 }
 
 .btn:hover {
-  border-color: var(--neon-cyan);
-  color: var(--neon-cyan);
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border-color: var(--border-hover);
 }
 
 .btn.primary {
-  background: var(--neon-cyan);
-  border-color: var(--neon-cyan);
-  color: var(--bg-primary);
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
 }
 
 .btn.primary:hover {
-  background: transparent;
-  color: var(--neon-cyan);
+  background: var(--primary-hover);
 }
 </style>

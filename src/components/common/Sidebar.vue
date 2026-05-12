@@ -22,10 +22,10 @@
       <div class="sidebar-toolbar">
         <input
           v-model="searchKeyword"
-          placeholder="SEARCH..."
-          class="cyber-input"
+          placeholder="搜索..."
+          class="sidebar-input"
         />
-        <button class="cyber-btn-small" @click="showAddCollection = true" title="新建集合">+</button>
+        <button class="sidebar-btn-small" @click="showAddCollection = true" title="新建集合">+</button>
       </div>
 
       <!-- 添加集合弹窗 -->
@@ -33,12 +33,12 @@
         <input
           v-model="newCollectionName"
           placeholder="集合名称"
-          class="cyber-input"
+          class="sidebar-input"
           @keyup.enter="createCollection"
           ref="newColInput"
         />
-        <button class="cyber-btn-small success" @click="createCollection">✓</button>
-        <button class="cyber-btn-small danger" @click="showAddCollection = false">✕</button>
+        <button class="sidebar-btn-small success" @click="createCollection">✓</button>
+        <button class="sidebar-btn-small danger" @click="showAddCollection = false">✕</button>
       </div>
 
       <!-- 集合树 -->
@@ -81,7 +81,7 @@
           </div>
         </div>
         <div v-if="filteredCollections.length === 0" class="empty-tip">
-          <span class="glitch">// NO DATA</span>
+          <span>// 暂无数据</span>
         </div>
       </div>
     </div>
@@ -91,10 +91,10 @@
       <div class="sidebar-toolbar">
         <input
           v-model="historyKeyword"
-          placeholder="SEARCH..."
-          class="cyber-input"
+          placeholder="搜索..."
+          class="sidebar-input"
         />
-        <button class="cyber-btn-small danger" @click="clearHistory" title="清空历史">🗑</button>
+        <button class="sidebar-btn-small danger" @click="clearHistory" title="清空历史">🗑</button>
       </div>
       <div class="history-list">
         <div
@@ -115,13 +115,10 @@
           </div>
         </div>
         <div v-if="filteredHistory.length === 0" class="empty-tip">
-          <span class="glitch">// NO HISTORY</span>
+          <span>// 暂无历史</span>
         </div>
       </div>
     </div>
-
-    <!-- Scanline overlay -->
-    <div class="sidebar-scanlines"></div>
   </aside>
 </template>
 
@@ -275,25 +272,22 @@ function getStatusClass(code) {
   border: none;
   border-bottom: 2px solid transparent;
   color: var(--text-secondary);
-  font-family: var(--font-title);
+  font-family: var(--font-body);
   font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-fast);
 }
 
 .sidebar-tabs button.active {
-  color: var(--neon-cyan);
-  background: rgba(0, 255, 255, 0.1);
-  border-bottom-color: var(--neon-cyan);
-  text-shadow: 0 0 10px var(--neon-cyan);
+  color: var(--primary);
+  background: var(--primary-muted);
+  border-bottom-color: var(--primary);
 }
 
 .sidebar-tabs button:hover:not(.active) {
-  color: var(--neon-cyan);
-  background: rgba(0, 255, 255, 0.05);
+  color: var(--text-primary);
+  background: var(--bg-card);
 }
 
 .tab-icon {
@@ -313,55 +307,57 @@ function getStatusClass(code) {
   margin-bottom: 8px;
 }
 
-.cyber-input {
+.sidebar-input {
   flex: 1;
   padding: 6px 10px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 1px;
-  background: var(--bg-secondary);
+  font-family: var(--font-body);
+  font-size: 13px;
+  background: var(--bg-card);
   border: 1px solid var(--border-default);
-  color: var(--neon-cyan);
+  color: var(--text-primary);
   outline: none;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
 }
 
-.cyber-input:focus {
-  border-color: var(--neon-cyan);
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3), inset 0 0 10px rgba(0, 255, 255, 0.1);
+.sidebar-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-muted);
 }
 
-.cyber-input::placeholder {
-  color: rgba(0, 255, 255, 0.3);
+.sidebar-input::placeholder {
+  color: var(--text-tertiary);
 }
 
-.cyber-btn-small {
+.sidebar-btn-small {
   width: 28px;
   height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
+  background: var(--bg-card);
   border: 1px solid var(--border-default);
   color: var(--text-secondary);
   font-size: 14px;
   cursor: pointer;
   transition: all var(--transition-fast);
+  border-radius: var(--radius-sm);
 }
 
-.cyber-btn-small:hover {
-  border-color: var(--neon-cyan);
-  color: var(--neon-cyan);
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+.sidebar-btn-small:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
 }
 
-.cyber-btn-small.success {
-  border-color: var(--neon-green);
-  color: var(--neon-green);
+.sidebar-btn-small.success {
+  border-color: var(--success-border);
+  color: var(--success);
 }
 
-.cyber-btn-small.danger {
-  border-color: var(--neon-pink);
-  color: var(--neon-pink);
+.sidebar-btn-small.danger {
+  border-color: var(--error-border);
+  color: var(--error);
 }
 
 .inline-input {
@@ -370,7 +366,7 @@ function getStatusClass(code) {
   margin-bottom: 8px;
 }
 
-.inline-input .cyber-input {
+.inline-input .sidebar-input {
   flex: 1;
 }
 
@@ -384,21 +380,18 @@ function getStatusClass(code) {
   gap: 8px;
   padding: 10px 12px;
   cursor: pointer;
-  border-radius: 4px;
-  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
   color: var(--text-secondary);
-  font-family: var(--font-title);
+  font-family: var(--font-body);
   font-size: 13px;
-  letter-spacing: 1px;
   transition: all var(--transition-fast);
   overflow: hidden;
   min-width: 0;
 }
 
 .collection-header:hover {
-  background: rgba(0, 255, 255, 0.05);
-  border-color: rgba(0, 255, 255, 0.2);
-  color: var(--neon-cyan);
+  background: var(--bg-card);
+  color: var(--text-primary);
 }
 
 .col-name {
@@ -406,7 +399,6 @@ function getStatusClass(code) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  text-transform: uppercase;
 }
 
 .col-count {
@@ -414,7 +406,6 @@ function getStatusClass(code) {
   color: var(--text-tertiary);
   margin-left: auto;
   flex-shrink: 0;
-  font-family: var(--font-mono);
 }
 
 .col-delete-btn,
@@ -426,7 +417,7 @@ function getStatusClass(code) {
   justify-content: center;
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 3px;
+  border-radius: var(--radius-xs);
   color: var(--text-secondary);
   font-size: 10px;
   cursor: pointer;
@@ -440,15 +431,10 @@ function getStatusClass(code) {
   display: flex;
 }
 
-.col-delete-btn:hover {
-  border-color: var(--neon-pink);
-  color: var(--neon-pink);
-  box-shadow: 0 0 8px rgba(255, 71, 87, 0.4);
-}
-
+.col-delete-btn:hover,
 .req-delete-btn:hover {
-  border-color: var(--neon-pink);
-  color: var(--neon-pink);
+  background: var(--error-muted);
+  color: var(--error);
 }
 
 .request-item {
@@ -457,7 +443,7 @@ function getStatusClass(code) {
   gap: 8px;
   padding: 8px 12px 8px 24px;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
   border-left: 2px solid transparent;
   transition: all var(--transition-fast);
@@ -467,8 +453,8 @@ function getStatusClass(code) {
 }
 
 .request-item:hover {
-  background: rgba(0, 255, 255, 0.05);
-  border-left-color: var(--neon-cyan);
+  background: var(--bg-card);
+  border-left-color: var(--primary);
 }
 
 .request-name {
@@ -484,7 +470,7 @@ function getStatusClass(code) {
 .history-item {
   padding: 10px;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   margin-bottom: 4px;
   position: relative;
   border: 1px solid transparent;
@@ -492,8 +478,8 @@ function getStatusClass(code) {
 }
 
 .history-item:hover {
-  background: rgba(0, 255, 255, 0.05);
-  border-color: rgba(0, 255, 255, 0.2);
+  background: var(--bg-card);
+  border-color: var(--border-default);
 }
 
 .history-meta {
@@ -506,7 +492,6 @@ function getStatusClass(code) {
 .history-time {
   color: var(--text-secondary);
   font-size: 10px;
-  letter-spacing: 1px;
 }
 
 .history-url {
@@ -522,50 +507,18 @@ function getStatusClass(code) {
   position: absolute;
   right: 10px;
   top: 10px;
-  font-family: var(--font-title);
+  font-family: var(--font-body);
   font-size: 10px;
   font-weight: 600;
-  letter-spacing: 1px;
 }
 
-.status-success { color: var(--neon-green); }
-.status-error { color: #f00; }
+.status-success { color: var(--success); }
+.status-error { color: var(--error); }
 
 .empty-tip {
   text-align: center;
   color: var(--text-secondary);
-  font-size: 11px;
+  font-size: 12px;
   padding: 20px;
-  font-family: var(--font-mono);
-}
-
-.glitch {
-  animation: glitch 0.5s infinite;
-}
-
-.sidebar-scanlines {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0, 201, 167, 0.03) 0px,
-    rgba(0, 201, 167, 0.03) 1px,
-    transparent 1px,
-    transparent 2px
-  );
-  pointer-events: none;
-  opacity: 0.5;
-}
-
-@keyframes glitch {
-  0% { transform: translate(0); opacity: 0.7; }
-  20% { transform: translate(-1px, 1px); opacity: 0.8; }
-  40% { transform: translate(-1px, -1px); opacity: 0.7; }
-  60% { transform: translate(1px, 1px); opacity: 0.8; }
-  80% { transform: translate(1px, -1px); opacity: 0.7; }
-  100% { transform: translate(0); opacity: 0.7; }
 }
 </style>

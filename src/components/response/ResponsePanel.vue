@@ -2,7 +2,7 @@
   <div class="response-panel panel">
     <div class="panel-header">
       <span class="panel-title">
-        <span class="prompt">&gt;</span> RESPONSE
+        <span class="prompt">&gt;</span> 响应
       </span>
       <div v-if="response" class="response-actions">
         <button class="action-btn" @click="copyResponse" title="复制">📋 COPY</button>
@@ -14,7 +14,7 @@
     <!-- Loading 状态 -->
     <div v-if="loading" class="response-loading">
       <div class="loading-spinner">⟳</div>
-      <span class="loading-text">AWAITING RESPONSE...</span>
+      <span class="loading-text">等待响应...</span>
       <div class="loading-bar">
         <div class="loading-progress"></div>
       </div>
@@ -24,7 +24,7 @@
     <div v-else-if="error" class="response-error">
       <div class="error-title">
         <span class="error-icon">⚠</span>
-        CONNECTION FAILED
+        连接失败
       </div>
       <div class="error-detail error-state">{{ error }}</div>
     </div>
@@ -61,20 +61,20 @@
       <!-- 响应体 Tab -->
       <div v-show="activeTab === 'body'" class="tab-content">
         <div class="section-header" @click="bodyExpanded = !bodyExpanded">
-          <span>BODY</span>
+          <span>响应体</span>
           <span>{{ bodyExpanded ? '▼' : '▶' }}</span>
         </div>
         <div v-show="bodyExpanded" class="response-body">
           <div class="body-toolbar">
             <button @click="toggleFormat" :class="{ active: formatted }">
-              {{ formatted ? '📐 RAW' : '📄 FORMATTED' }}
+              {{ formatted ? '📐 原始' : '📄 格式化' }}
             </button>
           </div>
           <pre class="body-content" :class="{ 'body-formatted': formatted }">{{ displayContent }}</pre>
         </div>
 
         <div class="section-header" @click="headersExpanded = !headersExpanded">
-          <span>HEADERS ({{ responseHeadersCount }})</span>
+          <span>响应头 ({{ responseHeadersCount }})</span>
           <span>{{ headersExpanded ? '▼' : '▶' }}</span>
         </div>
         <div v-show="headersExpanded" class="response-headers">
@@ -88,7 +88,7 @@
       <!-- 请求参数 Tab -->
       <div v-show="activeTab === 'request'" class="tab-content">
         <div class="section-header" @click="reqUrlExpanded = !reqUrlExpanded">
-          <span>REQUEST URL</span>
+          <span>请求 URL</span>
           <span>{{ reqUrlExpanded ? '▼' : '▶' }}</span>
         </div>
         <div v-show="reqUrlExpanded" class="request-url">
@@ -99,7 +99,7 @@
         </div>
 
         <div class="section-header" @click="reqHeadersExpanded = !reqHeadersExpanded">
-          <span>HEADERS ({{ requestHeadersCount }})</span>
+          <span>请求头 ({{ requestHeadersCount }})</span>
           <span>{{ reqHeadersExpanded ? '▼' : '▶' }}</span>
         </div>
         <div v-show="reqHeadersExpanded" class="request-headers">
@@ -107,11 +107,11 @@
             <span class="header-key">{{ item.key }}</span>
             <span class="header-value">{{ item.value }}</span>
           </div>
-          <div v-if="enabledHeaders.length === 0" class="empty-hint">-- NO DATA --</div>
+          <div v-if="enabledHeaders.length === 0" class="empty-hint">-- 暂无数据 --</div>
         </div>
 
         <div class="section-header" @click="reqParamsExpanded = !reqParamsExpanded">
-          <span>PARAMS ({{ queryParamsCount }})</span>
+          <span>查询参数 ({{ queryParamsCount }})</span>
           <span>{{ reqParamsExpanded ? '▼' : '▶' }}</span>
         </div>
         <div v-show="reqParamsExpanded" class="request-headers">
@@ -119,16 +119,16 @@
             <span class="header-key">{{ item.key }}</span>
             <span class="header-value">{{ item.value }}</span>
           </div>
-          <div v-if="enabledParams.length === 0" class="empty-hint">-- NO DATA --</div>
+          <div v-if="enabledParams.length === 0" class="empty-hint">-- 暂无数据 --</div>
         </div>
 
         <div class="section-header" @click="reqBodyExpanded = !reqBodyExpanded">
-          <span>BODY</span>
+          <span>请求体</span>
           <span>{{ reqBodyExpanded ? '▼' : '▶' }}</span>
         </div>
         <div v-show="reqBodyExpanded" class="request-body">
           <pre v-if="requestStore.body" class="body-content">{{ requestStore.body }}</pre>
-          <div v-else class="empty-hint">-- NO DATA --</div>
+          <div v-else class="empty-hint">-- 暂无数据 --</div>
         </div>
       </div>
     </div>
@@ -136,8 +136,8 @@
     <!-- 空状态 -->
     <div v-else class="response-empty">
       <div class="empty-icon">◌</div>
-      <div class="empty-text">AWAITING INPUT</div>
-      <div class="empty-hint">// SEND A REQUEST TO SEE THE RESPONSE</div>
+      <div class="empty-text">等待输入</div>
+      <div class="empty-hint">// 发送请求以查看响应</div>
     </div>
   </div>
 </template>
@@ -156,8 +156,8 @@ const method = computed(() => requestStore.method)
 const fullUrl = computed(() => requestStore.fullUrl)
 
 const tabs = [
-  { key: 'body', label: 'BODY' },
-  { key: 'request', label: 'REQUEST' }
+  { key: 'body', label: '响应体' },
+  { key: 'request', label: '请求信息' }
 ]
 const activeTab = ref('body')
 
@@ -242,9 +242,12 @@ function downloadResponse() {
   min-height: 300px;
   display: flex;
   flex-direction: column;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
 }
 
-/* 禁用 panel 角落装饰 */
 .response-panel::before,
 .response-panel::after {
   display: none;
@@ -254,21 +257,20 @@ function downloadResponse() {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 16px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--border-default);
-  background: rgba(0, 255, 255, 0.02);
+  background: var(--bg-tertiary);
 }
 
 .panel-title {
-  font-family: var(--font-title);
-  font-size: 12px;
+  font-family: var(--font-body);
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 2px;
-  color: var(--neon-cyan);
+  color: var(--text-primary);
 }
 
 .prompt {
-  color: var(--neon-magenta);
+  color: var(--secondary);
   margin-right: 8px;
 }
 
@@ -279,20 +281,20 @@ function downloadResponse() {
 
 .action-btn {
   padding: 4px 10px;
-  background: transparent;
+  background: var(--bg-card);
   border: 1px solid var(--border-default);
   color: var(--text-secondary);
-  font-family: var(--font-title);
-  font-size: 10px;
-  letter-spacing: 1px;
+  font-family: var(--font-body);
+  font-size: 11px;
   cursor: pointer;
   transition: all var(--transition-fast);
+  border-radius: var(--radius-sm);
 }
 
 .action-btn:hover {
-  border-color: var(--neon-cyan);
-  color: var(--neon-cyan);
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border-color: var(--border-hover);
 }
 
 .response-loading {
@@ -307,9 +309,8 @@ function downloadResponse() {
 
 .loading-spinner {
   font-size: 32px;
-  color: var(--neon-cyan);
+  color: var(--primary);
   animation: spin 1s linear infinite;
-  text-shadow: 0 0 20px var(--neon-cyan);
 }
 
 @keyframes spin {
@@ -318,10 +319,9 @@ function downloadResponse() {
 }
 
 .loading-text {
-  font-family: var(--font-title);
+  font-family: var(--font-body);
   font-size: 12px;
-  letter-spacing: 2px;
-  color: var(--neon-cyan);
+  color: var(--text-secondary);
 }
 
 .loading-bar {
@@ -334,7 +334,7 @@ function downloadResponse() {
 
 .loading-progress {
   height: 100%;
-  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
   animation: loading-progress 1.5s infinite;
 }
 
@@ -352,45 +352,25 @@ function downloadResponse() {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-family: var(--font-title);
+  font-family: var(--font-body);
   font-size: 14px;
   font-weight: 600;
-  color: #f00;
-  letter-spacing: 2px;
+  color: var(--error);
   margin-bottom: 12px;
 }
 
 .error-icon {
   font-size: 18px;
-  animation: pulse-glow 0.5s infinite;
-}
-
-@keyframes pulse-glow {
-  0%, 100% { filter: drop-shadow(0 0 5px #f00); }
-  50% { filter: drop-shadow(0 0 15px #f00); }
 }
 
 .error-detail {
-  background: var(--bg-secondary);
+  background: var(--bg-tertiary);
   padding: 12px;
-  border: 1px solid rgba(255, 0, 0, 0.3);
-  border-radius: 4px;
+  border: 1px solid var(--error-border);
+  border-radius: var(--radius-sm);
   font-family: var(--font-mono);
   font-size: 12px;
-  color: #f00;
-}
-
-.error-state {
-  animation: glitch 0.3s infinite;
-}
-
-@keyframes glitch {
-  0% { transform: translate(0); }
-  20% { transform: translate(-2px, 2px); }
-  40% { transform: translate(-2px, -2px); }
-  60% { transform: translate(2px, 2px); }
-  80% { transform: translate(2px, -2px); }
-  100% { transform: translate(0); }
+  color: var(--error);
 }
 
 .response-overview {
@@ -399,48 +379,39 @@ function downloadResponse() {
   gap: 20px;
   padding: 12px 16px;
   border-bottom: 1px solid var(--border-default);
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--bg-tertiary);
 }
 
 .status-badge {
   padding: 4px 12px;
-  border-radius: 2px;
-  font-family: var(--font-title);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-weight: 600;
 }
 
 .status-badge.status-2xx {
-  background: rgba(0, 255, 0, 0.2);
-  color: var(--neon-green);
-  border: 1px solid var(--neon-green);
-  box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+  background: var(--success-muted);
+  color: var(--success);
+  border: 1px solid var(--success-border);
 }
 
 .status-badge.status-3xx {
-  background: rgba(255, 170, 0, 0.2);
-  color: var(--neon-orange);
-  border: 1px solid var(--neon-orange);
+  background: var(--warning-muted);
+  color: var(--warning);
+  border: 1px solid var(--warning-border);
 }
 
 .status-badge.status-4xx {
-  background: rgba(255, 0, 0, 0.2);
-  color: #f00;
-  border: 1px solid #f00;
-  box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+  background: var(--error-muted);
+  color: var(--error);
+  border: 1px solid var(--error-border);
 }
 
 .status-badge.status-5xx {
-  background: rgba(255, 0, 0, 0.3);
-  color: #f00;
-  border: 1px solid #f00;
-  animation: alert-flash 0.5s infinite;
-}
-
-@keyframes alert-flash {
-  0%, 100% { opacity: 1; box-shadow: 0 0 10px rgba(255, 0, 0, 0.3); }
-  50% { opacity: 0.7; box-shadow: 0 0 20px rgba(255, 0, 0, 0.6); }
+  background: var(--error-muted);
+  color: var(--error);
+  border: 1px solid var(--error-border);
 }
 
 .overview-item {
@@ -453,7 +424,7 @@ function downloadResponse() {
 }
 
 .item-icon {
-  color: var(--neon-cyan);
+  color: var(--text-tertiary);
 }
 
 .response-tabs {
@@ -468,22 +439,22 @@ function downloadResponse() {
   background: transparent;
   border: 1px solid transparent;
   color: var(--text-secondary);
-  font-family: var(--font-title);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 2px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-fast);
+  border-radius: var(--radius-sm);
 }
 
 .response-tabs button.active {
-  background: rgba(0, 255, 255, 0.1);
-  border-color: var(--neon-cyan);
-  color: var(--neon-cyan);
+  background: var(--primary-muted);
+  color: var(--primary);
 }
 
 .response-tabs button:hover:not(.active) {
-  color: var(--neon-cyan);
+  background: var(--bg-card);
+  color: var(--text-primary);
 }
 
 .tab-content {
@@ -496,18 +467,17 @@ function downloadResponse() {
   justify-content: space-between;
   padding: 10px 16px;
   cursor: pointer;
-  font-family: var(--font-title);
-  font-size: 11px;
-  letter-spacing: 1px;
+  font-family: var(--font-body);
+  font-size: 12px;
   color: var(--text-secondary);
-  background: rgba(0, 255, 255, 0.02);
+  background: var(--bg-tertiary);
   border-bottom: 1px solid var(--border-default);
   transition: all var(--transition-fast);
 }
 
 .section-header:hover {
-  background: rgba(0, 255, 255, 0.05);
-  color: var(--neon-cyan);
+  background: var(--bg-card);
+  color: var(--text-primary);
 }
 
 .response-body,
@@ -524,28 +494,29 @@ function downloadResponse() {
   background: transparent;
   border: 1px solid var(--border-default);
   color: var(--text-secondary);
-  font-family: var(--font-title);
-  font-size: 10px;
-  letter-spacing: 1px;
+  font-family: var(--font-body);
+  font-size: 11px;
   cursor: pointer;
   transition: all var(--transition-fast);
+  border-radius: var(--radius-sm);
 }
 
 .body-toolbar button:hover,
 .body-toolbar button.active {
-  border-color: var(--neon-cyan);
-  color: var(--neon-cyan);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--border-hover);
 }
 
 .body-content {
-  background: var(--bg-secondary);
+  background: var(--bg-tertiary);
   border: 1px solid var(--border-default);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   padding: 12px;
   font-family: var(--font-mono);
   font-size: 12px;
   line-height: 1.6;
-  color: var(--neon-green);
+  color: var(--text-primary);
   max-height: 300px;
   overflow: auto;
   white-space: pre-wrap;
@@ -559,7 +530,7 @@ function downloadResponse() {
 }
 
 .header-key {
-  color: var(--neon-cyan);
+  color: var(--primary);
   font-family: var(--font-mono);
   font-size: 12px;
 }
@@ -579,26 +550,26 @@ function downloadResponse() {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--bg-secondary);
+  background: var(--bg-tertiary);
   padding: 10px 14px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   overflow-x: auto;
 }
 
 .method-badge {
   padding: 3px 10px;
-  border-radius: 2px;
-  font-family: var(--font-title);
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   flex-shrink: 0;
 }
 
-.method-badge.method-get { background: rgba(0, 255, 255, 0.2); color: var(--neon-cyan); }
-.method-badge.method-post { background: rgba(0, 255, 0, 0.2); color: var(--neon-green); }
-.method-badge.method-put { background: rgba(255, 170, 0, 0.2); color: var(--neon-orange); }
-.method-badge.method-delete { background: rgba(255, 0, 0, 0.2); color: #f00; }
-.method-badge.method-patch { background: rgba(255, 0, 170, 0.2); color: var(--neon-pink); }
+.method-badge.method-get { background: rgba(34, 197, 94, 0.12); color: var(--method-get); }
+.method-badge.method-post { background: rgba(59, 130, 246, 0.12); color: var(--method-post); }
+.method-badge.method-put { background: rgba(245, 158, 11, 0.12); color: var(--method-put); }
+.method-badge.method-delete { background: rgba(239, 68, 68, 0.12); color: var(--method-delete); }
+.method-badge.method-patch { background: rgba(139, 92, 246, 0.12); color: var(--method-patch); }
 
 .url-text {
   font-family: var(--font-mono);
@@ -619,11 +590,10 @@ function downloadResponse() {
 }
 
 .empty-hint {
-  color: var(--text-secondary);
+  color: var(--text-tertiary);
   font-family: var(--font-mono);
   font-size: 11px;
   padding: 8px 0;
-  opacity: 0.5;
 }
 
 .response-empty {
@@ -638,21 +608,18 @@ function downloadResponse() {
 
 .empty-icon {
   font-size: 48px;
-  color: var(--border-default);
-  animation: pulse-glow 2s infinite;
+  color: var(--text-tertiary);
 }
 
 .empty-text {
-  font-family: var(--font-title);
+  font-family: var(--font-body);
   font-size: 14px;
-  letter-spacing: 3px;
   color: var(--text-secondary);
 }
 
 .empty-hint {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--text-secondary);
-  opacity: 0.5;
+  color: var(--text-tertiary);
 }
 </style>

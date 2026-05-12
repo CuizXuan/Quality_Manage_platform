@@ -223,7 +223,7 @@
               </div>
               <input
                 v-model="registerForm.email"
-                type="email"
+                type="text"
                 placeholder="Email"
                 :disabled="loading"
               />
@@ -237,25 +237,10 @@
               </div>
               <input
                 v-model="registerForm.password"
-                :type="showPassword ? 'text' : 'password'"
+                type="password"
                 placeholder="Password (min 6 chars)"
                 :disabled="loading"
               />
-              <button
-                class="toggle-password"
-                type="button"
-                @click="showPassword = !showPassword"
-              >
-                <svg v-if="!showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                  <circle cx="12" cy="12" r="3"/>
-                </svg>
-                <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path d="M17.94 17.94A10.5 10.5 0 0 1 12 20c-7 0-11-8-11-8a21 21 0 0 1 4-6"/>
-                  <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/>
-                  <line x1="1" y1="1" x2="23" y2="23"/>
-                </svg>
-              </button>
             </div>
             <div v-if="error" class="error-message">
               <span class="error-text">{{ error }}</span>
@@ -324,7 +309,7 @@ const displayedLogs = computed(() => {
 
 let logInterval
 
-function handleLogin() {
+async function handleLogin() {
   error.value = ''
 
   if (!loginForm.value.username.trim()) {
@@ -339,18 +324,20 @@ function handleLogin() {
 
   loading.value = true
 
-  const success = authStore.login(loginForm.value.username, loginForm.value.password)
-
-  if (success) {
-    router.push('/')
-  } else {
-    error.value = authStore.error || '登录失败'
+  try {
+    const success = await authStore.login(loginForm.value.username, loginForm.value.password)
+    if (success) {
+      router.push('/')
+    } else {
+      error.value = authStore.error || '登录失败'
+    }
+  } catch (err) {
+    error.value = err.message || '登录失败'
+  } finally {
+    loading.value = false
   }
-
-  loading.value = false
 }
-
-function handleRegister() {
+async function handleRegister() {
   error.value = ''
 
   if (!registerForm.value.username.trim()) {
@@ -363,6 +350,13 @@ function handleRegister() {
     return
   }
 
+  // Email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(registerForm.value.email)) {
+    error.value = '请输入有效的邮箱地址'
+    return
+  }
+
   if (registerForm.value.password.length < 6) {
     error.value = '密码长度至少6位'
     return
@@ -370,21 +364,23 @@ function handleRegister() {
 
   loading.value = true
 
-  const success = authStore.register(
-    registerForm.value.username,
-    registerForm.value.email,
-    registerForm.value.password
-  )
-
-  if (success) {
-    router.push('/')
-  } else {
-    error.value = authStore.error || '注册失败'
+  try {
+    const success = await authStore.register(
+      registerForm.value.username,
+      registerForm.value.email,
+      registerForm.value.password
+    )
+    if (success) {
+      router.push('/')
+    } else {
+      error.value = authStore.error || '注册失败'
+    }
+  } catch (err) {
+    error.value = err.message || '注册失败'
+  } finally {
+    loading.value = false
   }
-
-  loading.value = false
 }
-
 // AI Network Canvas - 更精致的节点网络
 let canvas, ctx, nodes, animationId
 let logCanvas, logCtx, logParticles
@@ -1264,6 +1260,7 @@ h1.main-title {
 .btn-login:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  pointer-events: none;
 }
 
 .loading-spinner {

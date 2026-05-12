@@ -3,7 +3,7 @@
     <div class="status-left">
       <span class="status-item">
         <span class="status-dot online"></span>
-        <span>SYSTEM ONLINE</span>
+        <span>系统在线</span>
       </span>
       <span class="status-item">
         <span class="separator">|</span>
@@ -12,7 +12,7 @@
     </div>
     <div class="status-right">
       <span class="status-item">
-        <span class="label">ENV:</span>
+        <span class="label">环境:</span>
         <span class="value">{{ envName }}</span>
       </span>
       <span class="status-item">
@@ -53,16 +53,14 @@ onUnmounted(() => {
   justify-content: space-between;
   padding: 0 16px;
   background: var(--bg-secondary);
-  border-top: 1px solid var(--neon-cyan);
-  box-shadow: 0 -1px 0 rgba(0, 255, 255, 0.2);
+  border-top: 1px solid var(--border-default);
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   z-index: 100;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 1px;
+  font-family: var(--font-body);
+  font-size: 11px;
   color: var(--text-secondary);
 }
 
@@ -82,34 +80,26 @@ onUnmounted(() => {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  animation: pulse-glow 2s infinite;
 }
 
 .status-dot.online {
-  background: var(--neon-green);
-  box-shadow: 0 0 5px var(--neon-green);
+  background: var(--success);
 }
 
 .status-dot.offline {
-  background: #f00;
-  box-shadow: 0 0 5px #f00;
+  background: var(--error);
 }
 
 .separator {
-  color: var(--border-default);
+  color: var(--text-tertiary);
 }
 
 .label {
-  color: var(--text-secondary);
+  color: var(--text-tertiary);
 }
 
 .value {
-  color: var(--neon-cyan);
-  font-weight: 600;
-}
-
-@keyframes pulse-glow {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  color: var(--primary);
+  font-weight: 500;
 }
 </style>

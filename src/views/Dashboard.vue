@@ -1,10 +1,10 @@
 <template>
   <div class="dashboard">
     <!-- 请求解析器 -->
-    <div class="panel parser-panel">
+    <div class="parser-panel">
       <div class="panel-header">
         <span class="panel-title">
-          <span class="prompt">&gt;</span> URL PARSER
+          <span class="prompt">&gt;</span> URL 解析器
         </span>
       </div>
       <RequestParser @parsed="onParsed" />
@@ -229,22 +229,22 @@ async function saveCaseFromModal() {
 
 const tabs = computed(() => [
   {
-    label: 'HEADERS',
+    label: '请求头',
     value: 'headers',
     count: requestStore.headers.filter(h => h.key.trim()).length,
   },
   {
-    label: 'PARAMS',
+    label: '参数',
     value: 'params',
     count: requestStore.params.filter(p => p.key.trim()).length,
   },
   {
-    label: 'BODY',
+    label: '请求体',
     value: 'body',
     count: requestStore.body ? 1 : 0,
   },
   {
-    label: 'AUTH',
+    label: '认证',
     value: 'auth',
     count: authConfig.value.type !== 'none' ? 1 : 0,
   },
@@ -279,6 +279,7 @@ async function convertToCase() {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  padding: 16px;
 }
 
 .parser-panel {
@@ -289,33 +290,29 @@ async function convertToCase() {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 16px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--border-default);
-  background: rgba(0, 255, 255, 0.02);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
 }
 
 .panel-title {
-  font-family: var(--font-title);
-  font-size: 12px;
+  font-family: var(--font-body);
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 2px;
-  color: var(--neon-cyan);
-  text-transform: uppercase;
+  color: var(--text-primary);
 }
 
 .prompt {
-  color: var(--neon-magenta);
+  color: var(--secondary);
   margin-right: 8px;
-  animation: blink 1s infinite;
-}
-
-@keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
 }
 
 .request-config {
   padding: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
 }
 
 .config-tabs {
@@ -336,36 +333,36 @@ async function convertToCase() {
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
   color: var(--text-secondary);
-  font-family: var(--font-title);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-fast);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
 }
 
 .config-tabs button.active {
-  color: var(--neon-cyan);
-  border-bottom-color: var(--neon-cyan);
-  text-shadow: 0 0 10px var(--neon-cyan);
+  color: var(--primary);
+  background: var(--primary-muted);
+  border-bottom-color: var(--primary);
 }
 
 .config-tabs button:hover:not(.active) {
-  color: var(--neon-cyan);
+  color: var(--text-primary);
+  background: var(--bg-card);
 }
 
 .tab-count {
-  background: rgba(0, 255, 255, 0.2);
-  color: var(--neon-cyan);
+  background: var(--bg-card);
+  color: var(--text-secondary);
   padding: 1px 6px;
   border-radius: 10px;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .config-tabs button.active .tab-count {
-  background: var(--neon-cyan);
-  color: var(--bg-primary);
+  background: var(--primary);
+  color: white;
 }
 
 .tab-pane {
@@ -376,14 +373,14 @@ async function convertToCase() {
   position: relative;
 }
 
-/* 用例创建弹窗 */
 .case-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -391,13 +388,15 @@ async function convertToCase() {
 }
 
 .case-modal {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
   width: 600px;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
+  box-shadow: var(--shadow-xl);
 }
 
 .case-modal-header {
@@ -405,7 +404,7 @@ async function convertToCase() {
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-default);
 }
 
 .case-modal-header h3 {
@@ -438,7 +437,7 @@ async function convertToCase() {
   justify-content: flex-end;
   gap: 12px;
   padding: 16px 20px;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--border-default);
 }
 
 .form-group {
@@ -457,20 +456,22 @@ async function convertToCase() {
 .form-group select,
 .form-group textarea {
   width: 100%;
-  padding: 8px 12px;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
+  padding: 10px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
   color: var(--text-primary);
   font-size: 13px;
   box-sizing: border-box;
+  transition: all var(--transition-fast);
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: var(--neon-cyan);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-muted);
 }
 
 .form-row {

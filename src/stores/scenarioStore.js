@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { scenariosApi } from '../api/scenario'
+import { useToastStore } from './toast'
 
 export const useScenarioStore = defineStore('scenario', () => {
   const scenarios = ref([])
@@ -19,6 +20,14 @@ export const useScenarioStore = defineStore('scenario', () => {
   async function createScenario(data) {
     const res = await scenariosApi.create(data)
     scenarios.value.push(res.data)
+    const toast = useToastStore()
+    toast.addToast({
+      id: Date.now(),
+      type: 'success',
+      title: '创建成功',
+      message: `场景"${data.name}"已创建`,
+      duration: 3000
+    })
     return res.data
   }
 
@@ -26,12 +35,28 @@ export const useScenarioStore = defineStore('scenario', () => {
     const res = await scenariosApi.update(id, data)
     const idx = scenarios.value.findIndex(s => s.id === id)
     if (idx !== -1) scenarios.value[idx] = res.data
+    const toast = useToastStore()
+    toast.addToast({
+      id: Date.now(),
+      type: 'success',
+      title: '更新成功',
+      message: '场景信息已保存',
+      duration: 3000
+    })
     return res.data
   }
 
   async function deleteScenario(id) {
     await scenariosApi.delete(id)
     scenarios.value = scenarios.value.filter(s => s.id !== id)
+    const toast = useToastStore()
+    toast.addToast({
+      id: Date.now(),
+      type: 'success',
+      title: '删除成功',
+      message: '场景已删除',
+      duration: 3000
+    })
   }
 
   async function addStep(scenarioId, data) {

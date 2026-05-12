@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { datasetApi } from '../api/dataset'
+import { useToastStore } from './toast'
 
 export const useDatasetStore = defineStore('dataset', () => {
   const datasets = ref([])
@@ -21,6 +22,14 @@ export const useDatasetStore = defineStore('dataset', () => {
   async function createDataset(data) {
     const res = await datasetApi.create(data)
     datasets.value.push(res.data)
+    const toast = useToastStore()
+    toast.addToast({
+      id: Date.now(),
+      type: 'success',
+      title: '创建成功',
+      message: `数据集"${data.name}"已创建`,
+      duration: 3000
+    })
     return res.data
   }
 
@@ -28,12 +37,28 @@ export const useDatasetStore = defineStore('dataset', () => {
     const res = await datasetApi.update(id, data)
     const idx = datasets.value.findIndex(d => d.id === id)
     if (idx !== -1) datasets.value[idx] = res.data
+    const toast = useToastStore()
+    toast.addToast({
+      id: Date.now(),
+      type: 'success',
+      title: '更新成功',
+      message: '数据集信息已保存',
+      duration: 3000
+    })
     return res.data
   }
 
   async function deleteDataset(id) {
     await datasetApi.delete(id)
     datasets.value = datasets.value.filter(d => d.id !== id)
+    const toast = useToastStore()
+    toast.addToast({
+      id: Date.now(),
+      type: 'success',
+      title: '删除成功',
+      message: '数据集已删除',
+      duration: 3000
+    })
   }
 
   async function fetchPreview(id, params = {}) {

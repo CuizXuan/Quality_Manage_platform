@@ -1,6 +1,7 @@
 // Phase 4 - 认证状态管理
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { useToastStore } from './toast'
 
 const API_BASE = '/api/auth'
 
@@ -16,7 +17,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => !!accessToken.value)
   const isAdmin = computed(() => {
     if (!user.value) return false
-    return user.value.roles?.includes('SuperAdmin') || 
+    return user.value.roles?.includes('SuperAdmin') ||
            user.value.roles?.includes('TenantAdmin')
   })
   const currentUsername = computed(() => user.value?.username || '')
@@ -33,7 +34,7 @@ export const useAuthStore = defineStore('auth', () => {
         },
         body: JSON.stringify({ username, password })
       })
-      
+
       if (!response.ok) {
         let errMsg = '请求失败'
         try {
@@ -45,18 +46,28 @@ export const useAuthStore = defineStore('auth', () => {
         }
         throw new Error(errMsg)
       }
-      
+
       const data = await response.json()
       accessToken.value = data.access_token
       refreshToken.value = data.refresh_token
-      
+
       // 存储到 localStorage
       localStorage.setItem('access_token', data.access_token)
       localStorage.setItem('refresh_token', data.refresh_token)
-      
+
       // 获取用户信息
       await fetchUserInfo()
-      
+
+      // 显示成功 Toast
+      const toastStore = useToastStore()
+      toastStore.addToast({
+        id: Date.now(),
+        type: 'success',
+        title: '登录成功',
+        message: `欢迎回来 ${username}`,
+        duration: 3500
+      })
+
       return true
     } catch (err) {
       error.value = err.message
@@ -77,7 +88,7 @@ export const useAuthStore = defineStore('auth', () => {
         },
         body: JSON.stringify({ username, email, password })
       })
-      
+
       if (!response.ok) {
         let errMsg = '请求失败'
         try {
@@ -89,18 +100,28 @@ export const useAuthStore = defineStore('auth', () => {
         }
         throw new Error(errMsg)
       }
-      
+
       const data = await response.json()
       accessToken.value = data.access_token
       refreshToken.value = data.refresh_token
-      
+
       // 存储到 localStorage
       localStorage.setItem('access_token', data.access_token)
       localStorage.setItem('refresh_token', data.refresh_token)
-      
+
       // 获取用户信息
       await fetchUserInfo()
-      
+
+      // 显示成功 Toast
+      const toastStore = useToastStore()
+      toastStore.addToast({
+        id: Date.now(),
+        type: 'success',
+        title: '注册成功',
+        message: '账号创建成功',
+        duration: 3500
+      })
+
       return true
     } catch (err) {
       error.value = err.message

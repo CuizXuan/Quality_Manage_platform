@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { scheduleApi } from '../api/schedule'
+import { useToastStore } from './toast'
 
 export const useScheduleStore = defineStore('schedule', () => {
   const schedules = ref([])
@@ -19,6 +20,14 @@ export const useScheduleStore = defineStore('schedule', () => {
   async function createSchedule(data) {
     const res = await scheduleApi.create(data)
     schedules.value.push(res.data)
+    const toast = useToastStore()
+    toast.addToast({
+      id: Date.now(),
+      type: 'success',
+      title: '创建成功',
+      message: `定时任务"${data.name}"已创建`,
+      duration: 3000
+    })
     return res.data
   }
 
@@ -26,12 +35,28 @@ export const useScheduleStore = defineStore('schedule', () => {
     const res = await scheduleApi.update(id, data)
     const idx = schedules.value.findIndex(s => s.id === id)
     if (idx !== -1) schedules.value[idx] = res.data
+    const toast = useToastStore()
+    toast.addToast({
+      id: Date.now(),
+      type: 'success',
+      title: '更新成功',
+      message: '定时任务已保存',
+      duration: 3000
+    })
     return res.data
   }
 
   async function deleteSchedule(id) {
     await scheduleApi.delete(id)
     schedules.value = schedules.value.filter(s => s.id !== id)
+    const toast = useToastStore()
+    toast.addToast({
+      id: Date.now(),
+      type: 'success',
+      title: '删除成功',
+      message: '定时任务已删除',
+      duration: 3000
+    })
   }
 
   async function toggleSchedule(id, enabled) {

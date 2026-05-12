@@ -2,7 +2,7 @@
   <div class="app-layout" :class="themeClass">
     <template v-if="showAppLayout">
       <DigitalRain v-if="isDark" />
-      <AppHeader :is-dark="isDark" @toggle-theme="toggleTheme" />
+      <AppHeader :is-dark="isDark" @toggle-theme="toggleTheme" @set-theme="setTheme" />
       <div class="app-body">
         <Sidebar v-if="showSidebar" :is-dark="isDark" @load-request="onLoadRequest" />
         <main class="app-main" :class="{ 'no-sidebar': !showSidebar }">
@@ -58,6 +58,12 @@ function updateThemeClass() {
 
 function toggleTheme() {
   isDark.value = !isDark.value
+  localStorage.setItem('cyber-theme', isDark.value ? 'dark' : 'light')
+  updateThemeClass()
+}
+
+function setTheme(theme) {
+  isDark.value = theme === 'dark'
   localStorage.setItem('cyber-theme', isDark.value ? 'dark' : 'light')
   updateThemeClass()
 }

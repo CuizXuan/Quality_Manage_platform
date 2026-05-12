@@ -270,11 +270,6 @@ defineExpose({ close })
 </script>
 
 <style scoped>
-/* ========================================
-   CYBER CONFIRM POPOVER
-   Ant Design Popconfirm style with CSS variables for theme support
-   ======================================== */
-
 .cyber-confirm-wrapper {
   display: inline-block;
   position: relative;
@@ -284,25 +279,19 @@ defineExpose({ close })
   cursor: pointer;
 }
 
-/* Popover bubble - CSS variables for theme adaptation */
 .cyber-popover {
-  /* Background - theme-aware */
-  background: var(--bg-panel, #0d0d14);
-  border: 1px solid var(--popover-border-color, rgba(0, 255, 255, 0.5));
-  border-radius: 8px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
   padding: 14px 16px;
   min-width: 200px;
   max-width: 320px;
-  box-shadow:
-    0 0 12px var(--popover-glow-color, rgba(0, 255, 255, 0.15)),
-    0 4px 24px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-xl);
 }
 
 .cyber-popover.is-danger {
-  --popover-border-color: var(--neon-pink, rgba(255, 0, 170, 0.5));
-  --popover-glow-color: rgba(255, 0, 170, 0.15);
-  border-color: var(--popover-border-color);
+  border-color: var(--error-border);
 }
 
 .cyber-popover.placement-top {
@@ -313,7 +302,6 @@ defineExpose({ close })
   --popover-arrow-direction: rightward;
 }
 
-/* Content area */
 .popover-content {
   display: flex;
   align-items: flex-start;
@@ -325,12 +313,12 @@ defineExpose({ close })
   flex-shrink: 0;
   width: 16px;
   height: 16px;
-  color: var(--popover-icon-color, #f59e0b);
+  color: var(--warning);
   margin-top: 1px;
 }
 
 .is-danger .popover-icon {
-  color: var(--neon-pink, #ff00aa);
+  color: var(--error);
 }
 
 .popover-icon svg {
@@ -343,13 +331,12 @@ defineExpose({ close })
 }
 
 .popover-title {
-  font-family: var(--font-mono, 'Fira Code', monospace);
-  font-size: 12px;
-  color: var(--text-primary, #e0e0e0);
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-primary);
   line-height: 1.5;
 }
 
-/* Action buttons */
 .popover-actions {
   display: flex;
   gap: 8px;
@@ -362,41 +349,44 @@ defineExpose({ close })
   align-items: center;
   justify-content: center;
   gap: 5px;
-  padding: 5px 12px;
-  border-radius: 4px;
-  font-family: var(--font-mono, 'Fira Code', monospace);
-  font-size: 11px;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s ease;
-  border: 1px solid var(--btn-border-color, rgba(0, 255, 255, 0.4));
-  background: transparent;
-  color: var(--btn-text-color, #888);
+  border: 1px solid var(--border-default);
+  background: var(--bg-card);
+  color: var(--text-secondary);
 }
 
 .btn-cancel:hover {
-  border-color: rgba(255, 255, 255, 0.3);
-  color: var(--text-primary, #e0e0e0);
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border-color: var(--border-hover);
 }
 
 .btn-confirm {
-  border-color: var(--neon-cyan, rgba(0, 255, 255, 0.5));
-  color: var(--neon-cyan, #0ff);
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-muted);
 }
 
 .btn-confirm:hover {
-  background: var(--btn-confirm-hover-bg, rgba(0, 255, 255, 0.1));
-  box-shadow: 0 0 8px var(--btn-confirm-hover-glow, rgba(0, 255, 255, 0.3));
+  background: var(--primary);
+  color: white;
 }
 
 .btn-confirm.danger {
-  border-color: var(--neon-pink, rgba(255, 0, 170, 0.5));
-  color: var(--neon-pink, #ff00aa);
+  border-color: var(--error);
+  color: var(--error);
+  background: var(--error-muted);
 }
 
 .btn-confirm.danger:hover {
-  background: rgba(255, 0, 170, 0.1);
-  box-shadow: 0 0 8px rgba(255, 0, 170, 0.3);
+  background: var(--error);
+  color: white;
 }
 
 .btn-confirm.loading {
@@ -415,7 +405,6 @@ defineExpose({ close })
   to { transform: rotate(360deg); }
 }
 
-/* Animation */
 .popover-enter-active {
   transition: opacity 0.2s ease-out, transform 0.2s ease-out;
 }
@@ -433,51 +422,5 @@ defineExpose({ close })
 .popover-leave-from {
   opacity: 1;
   transform: scale(1);
-}
-
-/* ========================================
-   LIGHT THEME OVERRIDES
-   ======================================== */
-:global(.theme-light) .cyber-popover {
-  background: var(--bg-panel, #ffffff);
-  border-color: var(--border-default, rgba(0, 201, 167, 0.3));
-  box-shadow:
-    0 0 8px rgba(0, 201, 167, 0.1),
-    0 4px 16px rgba(0, 0, 0, 0.12);
-}
-
-:global(.theme-light) .cyber-popover.is-danger {
-  border-color: var(--neon-magenta, rgba(244, 63, 94, 0.4));
-  box-shadow:
-    0 0 8px rgba(244, 63, 94, 0.1),
-    0 4px 16px rgba(0, 0, 0, 0.12);
-}
-
-:global(.theme-light) .popover-icon {
-  color: var(--neon-yellow, #f59e0b);
-}
-
-:global(.theme-light) .popover-title {
-  color: var(--text-primary, #1A1D2E);
-}
-
-:global(.theme-light) .btn-confirm {
-  border-color: var(--neon-cyan, rgba(0, 201, 167, 0.5));
-  color: var(--neon-cyan, #00C9A7);
-}
-
-:global(.theme-light) .btn-confirm:hover {
-  background: rgba(0, 201, 167, 0.08);
-  box-shadow: 0 0 6px rgba(0, 201, 167, 0.2);
-}
-
-:global(.theme-light) .btn-cancel {
-  border-color: var(--border-light, #E5E7EB);
-  color: var(--text-secondary, #5B6278);
-}
-
-:global(.theme-light) .btn-cancel:hover {
-  border-color: var(--text-secondary, #5B6278);
-  color: var(--text-primary, #1A1D2E);
 }
 </style>

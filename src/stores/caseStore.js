@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { casesApi } from '../api/case'
 import { foldersApi } from '../api/folder'
+import { useToastStore } from './toast'
 
 export const useCaseStore = defineStore('case', () => {
   const cases = ref([])
@@ -35,6 +36,14 @@ export const useCaseStore = defineStore('case', () => {
   async function createCase(data) {
     const res = await casesApi.create(data)
     cases.value.push(res.data)
+    const toast = useToastStore()
+    toast.addToast({
+      id: Date.now(),
+      type: 'success',
+      title: '创建成功',
+      message: `用例"${data.name}"已创建`,
+      duration: 3000
+    })
     return res.data
   }
 
@@ -42,12 +51,28 @@ export const useCaseStore = defineStore('case', () => {
     const res = await casesApi.update(id, data)
     const idx = cases.value.findIndex(c => c.id === id)
     if (idx !== -1) cases.value[idx] = res.data
+    const toast = useToastStore()
+    toast.addToast({
+      id: Date.now(),
+      type: 'success',
+      title: '更新成功',
+      message: '用例信息已保存',
+      duration: 3000
+    })
     return res.data
   }
 
   async function deleteCase(id) {
     await casesApi.delete(id)
     cases.value = cases.value.filter(c => c.id !== id)
+    const toast = useToastStore()
+    toast.addToast({
+      id: Date.now(),
+      type: 'success',
+      title: '删除成功',
+      message: '用例已删除',
+      duration: 3000
+    })
   }
 
   async function duplicateCase(id) {
