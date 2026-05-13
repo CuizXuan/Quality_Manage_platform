@@ -6,12 +6,37 @@ import { useToastStore } from './toast'
 const API_BASE = '/api/auth'
 
 export const useAuthStore = defineStore('auth', () => {
-  // State
-  const accessToken = ref(localStorage.getItem('access_token') || null)
-  const refreshToken = ref(localStorage.getItem('refresh_token') || null)
+  // State - 根据 remember 选择存储位置
+  const getStorage = (key, defaultValue) => {
+    // 先检查 localStorage，再检查 sessionStorage
+    return localStorage.getItem(key) || sessionStorage.getItem(key) || defaultValue
+  }
+
+  const accessToken = ref(getStorage('access_token', null))
+  const refreshToken = ref(getStorage('refresh_token', null))
+  const remember = ref(!!localStorage.getItem('access_token') || !!sessionStorage.getItem('access_token'))
   const user = ref(null)
   const loading = ref(false)
   const error = ref(null)
+
+  // 辅助函数：存储 token
+  const saveTokens = (access, refresh) => {
+    if (remember.value) {
+      localStorage.setItem('access_token', access)
+      localStorage.setItem('refresh_token', refresh)
+    } else {
+      sessionStorage.setItem('access_token', access)
+      sessionStorage.setItem('refresh_token', refresh)
+    }
+  }
+
+  // 辅助函数：清除 token
+  const clearTokens = () => {
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
+    sessionStorage.removeItem('access_token')
+    sessionStorage.removeItem('refresh_token')
+  }
 
   // Getters
   const isAuthenticated = computed(() => !!accessToken.value)
@@ -23,9 +48,10 @@ export const useAuthStore = defineStore('auth', () => {
   const currentUsername = computed(() => user.value?.username || '')
 
   // Actions
-  async function login(username, password) {
+  async function login(username, password, rememberMe = false) {
     loading.value = true
     error.value = null
+    remember.value = rememberMe
     try {
       const response = await fetch(`${API_BASE}/login`, {
         method: 'POST',
@@ -51,9 +77,8 @@ export const useAuthStore = defineStore('auth', () => {
       accessToken.value = data.access_token
       refreshToken.value = data.refresh_token
 
-      // 存储到 localStorage
-      localStorage.setItem('access_token', data.access_token)
-      localStorage.setItem('refresh_token', data.refresh_token)
+      // 根据 remember 选择存储位置
+      saveTokens(data.access_token, data.refresh_token)
 
       // 获取用户信息
       await fetchUserInfo()
@@ -105,9 +130,8 @@ export const useAuthStore = defineStore('auth', () => {
       accessToken.value = data.access_token
       refreshToken.value = data.refresh_token
 
-      // 存储到 localStorage
-      localStorage.setItem('access_token', data.access_token)
-      localStorage.setItem('refresh_token', data.refresh_token)
+      // 根据 remember 选择存储位置
+      saveTokens(data.access_token, data.refresh_token)
 
       // 获取用户信息
       await fetchUserInfo()
@@ -178,7 +202,7 @@ export const useAuthStore = defineStore('auth', () => {
       
       const data = await response.json()
       accessToken.value = data.access_token
-      localStorage.setItem('access_token', data.access_token)
+      saveTokens(data.access_token, refreshToken.value)
       return true
     } catch (err) {
       error.value = err.message
@@ -191,8 +215,7 @@ export const useAuthStore = defineStore('auth', () => {
     accessToken.value = null
     refreshToken.value = null
     user.value = null
-    localStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
+    clearTokens()
   }
 
   // 初始化时获取用户信息

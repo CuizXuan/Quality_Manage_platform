@@ -199,9 +199,6 @@ router.beforeEach(async (to, from, next) => {
   if (requiresAuth && !authStore.isAuthenticated) {
     // 需要认证但未登录，跳转到登录页
     next({ name: 'Login', query: { redirect: to.fullPath } })
-  } else if (to.name === 'Login' && authStore.isAuthenticated) {
-    // 已登录访问登录页，跳转到首页
-    next({ name: 'Dashboard' })
   } else {
     next()
   }

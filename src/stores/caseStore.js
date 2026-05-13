@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { casesApi } from '../api/case'
-import { foldersApi } from '../api/folder'
+import { getCaseFolders } from '../api/caseFolders'
 import { useToastStore } from './toast'
 
 export const useCaseStore = defineStore('case', () => {
@@ -26,7 +26,7 @@ export const useCaseStore = defineStore('case', () => {
 
   async function fetchFolders() {
     try {
-      const res = await foldersApi.getTree()
+      const res = await getCaseFolders()
       folders.value = res.data
     } catch (e) {
       // silent fail for folders

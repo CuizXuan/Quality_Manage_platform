@@ -20,14 +20,14 @@
             <el-option label="↑ 升序" value="asc" />
           </el-select>
         </div>
-        <button class="btn primary" @click="showCreateModal = true">
+        <button class="btn primary" @click="editingCase = null; form = defaultForm(); showCreateModal = true">
           <span>+</span> 新建用例
         </button>
       </div>
     </div>
 
     <!-- Tab 切换：用例列表 / 分类管理 -->
-    <el-tabs v-model="activeTab" class="content-tabs">
+    <el-tabs v-model="activeTab" class="content-tabs cyber-tabs">
       <el-tab-pane label="用例列表" name="cases">
         <!-- 文件夹树 + 用例列表 -->
         <div class="content">
@@ -183,7 +183,7 @@ const caseStore = useCaseStore()
 const requestStore = useRequestStore()
 
 // ✅ 用 storeToRefs 保持响应式连接
-const { cases, loading, fetchError } = storeToRefs(caseStore)
+const { cases, folders, loading, fetchError } = storeToRefs(caseStore)
 
 const keyword = ref('')
 const activeTab = ref('cases')
@@ -208,18 +208,12 @@ const deletingCaseId = ref(null)   // 正在删除的用例
 const cyberConfirmRefs = ref({})
 
 const folderList = computed(() => {
-  const map = {}
-  cases.value.forEach(c => {
-    const path = c.folder_path || '/'
-    if (path !== '/') {
-      const name = path.split('/').filter(Boolean)[0] || ''
-      if (name && !map[name]) {
-        map[name] = { name, path: '/' + name, count: 0 }
-      }
-      if (map[name]) map[name].count++
-    }
-  })
-  return Object.values(map)
+  // 使用 store 中的 folders（来自 case-folders API）
+  return folders.value.map(f => ({
+    name: f.name,
+    path: '/' + f.name,
+    count: cases.value.filter(c => c.folder_path === '/' + f.name).length
+  }))
 })
 
 const filteredCases = computed(() => {
@@ -278,6 +272,15 @@ function debounceSearch() {
   }, 300)
 }
 
+// 操作后按默认条件重新查询
+function refreshWithDefaults() {
+  clearTimeout(searchTimer)
+  keyword.value = ''
+  sortBy.value = 'created_at'
+  sortOrder.value = 'desc'
+  caseStore.fetchCases({ sort_by: 'created_at', order: 'desc' })
+}
+
 async function saveCase() {
   // 重置错误状态
   formErrors.value = { name: false, method: false, url: false }
@@ -305,6 +308,8 @@ async function saveCase() {
     showCreateModal.value = false
     editingCase.value = null
     form.value = defaultForm()
+    // 操作完成后按默认条件重新查询
+    refreshWithDefaults()
   } catch (err) {
     ElMessage.error(editingCase.value ? '用例更新失败' : '用例创建失败')
     console.error('saveCase error:', err)
@@ -392,6 +397,8 @@ async function duplicateCase(id) {
   try {
     const newCase = await caseStore.duplicateCase(id)
     ElMessage.success(`用例复制成功 【${newCase?.name}】`)
+    // 操作完成后按默认条件重新查询
+    refreshWithDefaults()
   } catch (err) {
     ElMessage.error('用例复制失败')
     console.error('duplicateCase error:', err)
@@ -408,6 +415,8 @@ async function handleDelete(id) {
     ElMessage.success('删除成功')
     // 清理实例引用
     nextTick(() => { delete cyberConfirmRefs[id] })
+    // 操作完成后按默认条件重新查询
+    refreshWithDefaults()
   } catch (err) {
     ElMessage.error('删除失败')
     console.error('handleDelete error:', err)
@@ -425,6 +434,7 @@ async function handleDelete(id) {
 
 onMounted(() => {
   caseStore.fetchCases()
+  caseStore.fetchFolders()
 })
 
 // keep-alive 场景下：每次激活都重新拉取数据
@@ -748,5 +758,153 @@ onActivated(() => {
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   深色主题适配 - Element Plus 组件
+   ======================================== */
+
+/* el-select 下拉框适配 */
+:deep(.el-select) {
+  --el-fill-color-blank: var(--bg-secondary, #1a1a2e);
+  --el-text-color-regular: var(--neon-cyan, #00ffd5);
+  --el-border-color: var(--border-default, #2a2a4a);
+}
+
+:deep(.el-select .el-input__wrapper) {
+  background-color: var(--bg-secondary, #1a1a2e) !important;
+  box-shadow: 0 0 0 1px var(--border-default, #2a2a4a) !important;
+}
+
+:deep(.el-select .el-input__wrapper:hover) {
+  box-shadow: 0 0 0 1px var(--neon-cyan, #00ffd5) !important;
+}
+
+:deep(.el-select .el-input__inner) {
+  color: var(--neon-cyan, #00ffd5) !important;
+}
+
+:deep(.el-select-dropdown) {
+  background-color: var(--bg-panel, #16162a) !important;
+  border-color: var(--neon-cyan, #00ffd5) !important;
+}
+
+:deep(.el-select-dropdown__item) {
+  color: var(--text-primary, #e0e0e0) !important;
+}
+
+:deep(.el-select-dropdown__item.hover),
+:deep(.el-select-dropdown__item:hover) {
+  background-color: rgba(0, 255, 255, 0.1) !important;
+}
+
+:deep(.el-select-dropdown__item.selected) {
+  color: var(--neon-cyan, #00ffd5) !important;
+  font-weight: 600;
+}
+
+/* el-tabs 标签页适配 */
+:deep(.el-tabs) {
+  --el-tabs-header-height: 40px;
+}
+
+:deep(.el-tabs__header) {
+  background-color: transparent !important;
+  border-bottom: 1px solid var(--border-default, #2a2a4a) !important;
+  margin-bottom: 0;
+}
+
+:deep(.el-tabs__nav-wrap::after) {
+  display: none !important;
+}
+
+:deep(.el-tabs__item) {
+  color: var(--text-secondary, #8a8a9a) !important;
+  font-family: var(--font-title, 'Orbitron', sans-serif);
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding: 0 20px;
+  height: 40px;
+  line-height: 40px;
+}
+
+:deep(.el-tabs__item:hover) {
+  color: var(--neon-cyan, #00ffd5) !important;
+}
+
+:deep(.el-tabs__item.is-active) {
+  color: var(--neon-cyan, #00ffd5) !important;
+}
+
+:deep(.el-tabs__active-bar) {
+  background-color: var(--neon-cyan, #00ffd5) !important;
+  height: 2px;
+}
+
+:deep(.el-tabs__content) {
+  padding: 0;
+  overflow: hidden;
+}
+
+/* el-table 表格适配 */
+:deep(.el-table) {
+  --el-table-bg-color: var(--bg-panel, #16162a);
+  --el-table-tr-bg-color: var(--bg-panel, #16162a);
+  --el-table-header-bg-color: rgba(0, 255, 255, 0.05);
+  --el-table-header-text-color: var(--neon-cyan, #00ffd5);
+  --el-table-text-color: var(--text-primary, #e0e0e0);
+  --el-table-border-color: var(--border-default, #2a2a4a);
+  --el-table-row-hover-bg-color: rgba(0, 255, 255, 0.05);
+  font-family: var(--font-mono, monospace);
+}
+
+:deep(.el-table th.el-table__cell) {
+  background-color: rgba(0, 255, 255, 0.05) !important;
+  color: var(--neon-cyan, #00ffd5) !important;
+  font-family: var(--font-title, sans-serif);
+  font-size: 11px;
+  letter-spacing: 1px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-default, #2a2a4a) !important;
+}
+
+:deep(.el-table td.el-table__cell) {
+  border-bottom: 1px solid var(--border-default, #2a2a4a) !important;
+}
+
+:deep(.el-table__body tr) {
+  background-color: var(--bg-panel, #16162a) !important;
+}
+
+:deep(.el-table__body tr:hover > td.el-table__cell) {
+  background-color: rgba(0, 255, 255, 0.05) !important;
+}
+
+:deep(.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell) {
+  background: rgba(0, 255, 255, 0.02);
+}
+
+:deep(.el-table .cell) {
+  color: var(--text-primary, #e0e0e0);
+}
+
+/* el-button 按钮适配 */
+:deep(.el-button--primary) {
+  --el-button-bg-color: var(--neon-cyan, #00ffd5);
+  --el-button-border-color: var(--neon-cyan, #00ffd5);
+  --el-button-text-color: #0a0a1a;
+  --el-button-hover-bg-color: rgba(0, 255, 255, 0.8);
+  --el-button-hover-border-color: rgba(0, 255, 253, 0.8);
+  --el-button-hover-text-color: #0a0a1a;
+}
+
+:deep(.el-button--small) {
+  font-family: var(--font-title, sans-serif);
+  letter-spacing: 1px;
+  font-size: 11px;
+}
+
+:deep(.el-button + .el-button) {
+  margin-left: 8px;
 }
 </style>
