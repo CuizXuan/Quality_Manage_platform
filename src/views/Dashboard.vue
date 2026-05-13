@@ -1,75 +1,31 @@
 <template>
-  <div class="dashboard">
-    <!-- 请求解析器 -->
-    <div class="parser-panel">
-      <div class="panel-header">
-        <span class="panel-title">
-          <span class="prompt">&gt;</span> URL 解析器
-        </span>
-      </div>
-      <RequestParser @parsed="onParsed" />
-    </div>
+  <div class="ai-workspace">
+    <!-- AI Canvas - Main Content Area -->
+    <div class="ai-canvas">
+      <!-- Layer 1: Request Composer (compact, floating) -->
+      <RequestComposer class="floating-card" />
 
-    <!-- 请求配置区 -->
-    <div class="request-config panel">
-      <!-- 请求行 -->
-      <RequestBar @response-received="onResponseReceived" />
+      <!-- Layer 2: AI Insight Grid (MAIN FOCUS) -->
+      <AIInsightGrid class="floating-card" />
 
-      <!-- 参数 Tab -->
-      <div class="config-tabs">
-        <button
-          v-for="tab in tabs"
-          :key="tab.value"
-          :class="{ active: activeTab === tab.value }"
-          @click="activeTab = tab.value"
-        >
-          {{ tab.label }}
-          <span v-if="tab.count > 0" class="tab-count">{{ tab.count }}</span>
-        </button>
+      <!-- Layer 3: Response Intelligence -->
+      <div class="response-section floating-card">
+        <div class="section-header">
+          <span class="section-icon">📡</span>
+          <span class="section-title">Response Intelligence</span>
+          <div v-if="requestStore.response" class="response-meta">
+            <span class="status-badge" :class="statusClass">{{ requestStore.response.status_code }}</span>
+            <span class="duration-badge">{{ requestStore.response.duration_ms }}ms</span>
+          </div>
+        </div>
+        <ResponsePanel />
       </div>
 
-      <!-- Tab 内容 -->
-      <div class="config-content">
-        <div v-show="activeTab === 'headers'" class="tab-pane">
-          <KeyValueTable
-            :modelValue="requestStore.headers"
-            @update:modelValue="val => requestStore.headers = val"
-          />
-        </div>
-        <div v-show="activeTab === 'params'" class="tab-pane">
-          <KeyValueTable
-            :modelValue="requestStore.params"
-            @update:modelValue="val => requestStore.params = val"
-          />
-        </div>
-        <div v-show="activeTab === 'body'" class="tab-pane">
-          <BodyEditor
-            :modelValue="requestStore.body"
-            @update:modelValue="val => requestStore.body = val"
-            @update:type="t => requestStore.bodyType = t"
-          />
-        </div>
-        <div v-show="activeTab === 'auth'" class="tab-pane">
-          <AuthConfig
-            :modelValue="authConfig"
-            @update:modelValue="val => authConfig = val"
-          />
-        </div>
-      </div>
-
-      <!-- 断言配置 -->
-      <AssertionConfig
-        :modelValue="assertions"
-        @update:modelValue="val => assertions = val"
-      />
+      <!-- Layer 4: AI Activity Stream -->
+      <AIActivityStream />
     </div>
 
-    <!-- 响应展示区 -->
-    <div class="response-wrapper">
-      <ResponsePanel @convert-to-case="convertToCase" />
-    </div>
-
-    <!-- 用例创建/编辑弹窗 -->
+    <!-- Case Modal (reuse existing) -->
     <div v-if="showCaseModal" class="case-modal-overlay" @click.self="closeCaseModal">
       <div class="case-modal" role="dialog" aria-modal="true">
         <div class="case-modal-header">
@@ -101,14 +57,6 @@
             <label>描述</label>
             <textarea v-model="caseModalForm.description" rows="2" placeholder="用例描述..."></textarea>
           </div>
-          <div class="form-group">
-            <label>请求头 (JSON)</label>
-            <textarea v-model="caseModalForm.headersJson" rows="3" placeholder='{"Content-Type": "application/json"}'></textarea>
-          </div>
-          <div class="form-group">
-            <label>请求体</label>
-            <textarea v-model="caseModalForm.request_body" rows="4" placeholder="请求体内容..."></textarea>
-          </div>
         </div>
         <div class="case-modal-footer">
           <button class="btn" @click="closeCaseModal">取消</button>
@@ -122,26 +70,24 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
-import { useRequestStore } from '../stores/request'
-import { useCaseStore } from '../stores/caseStore'
-import RequestParser from '../components/request/RequestParser.vue'
-import RequestBar from '../components/request/RequestBar.vue'
-import BodyEditor from '../components/request/BodyEditor.vue'
-import KeyValueTable from '../components/request/KeyValueTable.vue'
-import ResponsePanel from '../components/response/ResponsePanel.vue'
-import AuthConfig from '../components/request/AuthConfig.vue'
-import AssertionConfig from '../components/request/AssertionConfig.vue'
+import { useRequestStore } from '@/stores/request'
+import { useCaseStore } from '@/stores/caseStore'
+import RequestComposer from '@/components/request/RequestComposer.vue'
+import AIInsightGrid from '@/components/ai/AIInsightGrid.vue'
+import ResponsePanel from '@/components/response/ResponsePanel.vue'
+import AIActivityStream from '@/components/ai/AIActivityStream.vue'
 
 const requestStore = useRequestStore()
 const caseStore = useCaseStore()
 
-const activeTab = ref('params')
-const assertions = ref([])
-const authConfig = ref({ type: 'none', config: {} })
-
-// 用例创建弹窗
 const showCaseModal = ref(false)
 const caseModalForm = ref(defaultCaseForm())
+
+const statusClass = computed(() => {
+  const code = requestStore.response?.status_code
+  if (!code) return ''
+  return code >= 200 && code < 300 ? 'success' : code >= 400 && code < 500 ? 'warning' : 'error'
+})
 
 function defaultCaseForm() {
   return {
@@ -151,26 +97,20 @@ function defaultCaseForm() {
     folder_path: '/终端导入',
     description: '',
     headers: {},
-    headersJson: '{}',
     body: '',
     request_body: '',
   }
 }
 
-function buildHeadersObj() {
-  const obj = {}
-  requestStore.headers.forEach(h => {
-    if (h.key && h.enabled !== false) {
-      obj[h.key] = h.value
-    }
-  })
-  return obj
-}
-
 function openCaseModal() {
   const method = requestStore.method || 'GET'
   const url = requestStore.url || ''
-  const headersObj = buildHeadersObj()
+  const headersObj = {}
+  requestStore.headers.forEach(h => {
+    if (h.key && h.enabled !== false) {
+      headersObj[h.key] = h.value
+    }
+  })
   caseModalForm.value = {
     name: `${method} ${url}`,
     method,
@@ -178,7 +118,6 @@ function openCaseModal() {
     folder_path: '/终端导入',
     description: `从终端调试创建 - ${new Date().toLocaleString()}`,
     headers: headersObj,
-    headersJson: JSON.stringify(headersObj, null, 2),
     body: requestStore.body || '',
     request_body: requestStore.body || '',
   }
@@ -190,90 +129,37 @@ function closeCaseModal() {
 }
 
 async function saveCaseFromModal() {
-  if (!caseModalForm.value.name || !caseModalForm.value.name.trim()) {
+  if (!caseModalForm.value.name?.trim()) {
     ElMessage.warning('请填写用例名称')
     return
   }
-  if (!caseModalForm.value.url || !caseModalForm.value.url.trim()) {
+  if (!caseModalForm.value.url?.trim()) {
     ElMessage.warning('请填写请求地址')
     return
   }
   try {
-    let headers = {}
-    try {
-      headers = JSON.parse(caseModalForm.value.headersJson || '{}')
-    } catch {
-      ElMessage.warning('请求头 JSON 格式错误，将使用空对象')
-      headers = {}
-    }
     const caseData = {
       name: caseModalForm.value.name.trim(),
       method: caseModalForm.value.method || 'GET',
       url: caseModalForm.value.url.trim(),
       folder_path: caseModalForm.value.folder_path || '/终端导入',
       description: caseModalForm.value.description || '',
-      headers,
+      headers: caseModalForm.value.headers || {},
       body: caseModalForm.value.request_body || '',
       request_body: caseModalForm.value.request_body || '',
       body_type: 'json',
     }
-    console.log('[Dashboard] 创建用例数据:', caseData)
     await caseStore.createCase(caseData)
     ElMessage.success('用例创建成功')
     closeCaseModal()
   } catch (err) {
     ElMessage.error('用例创建失败: ' + (err.message || err))
-    console.error('saveCaseFromModal error:', err)
   }
-}
-
-const tabs = computed(() => [
-  {
-    label: '请求头',
-    value: 'headers',
-    count: requestStore.headers.filter(h => h.key.trim()).length,
-  },
-  {
-    label: '参数',
-    value: 'params',
-    count: requestStore.params.filter(p => p.key.trim()).length,
-  },
-  {
-    label: '请求体',
-    value: 'body',
-    count: requestStore.body ? 1 : 0,
-  },
-  {
-    label: '认证',
-    value: 'auth',
-    count: authConfig.value.type !== 'none' ? 1 : 0,
-  },
-])
-
-function onParsed(result) {
-  console.log('[Dashboard] 收到解析结果:', result)
-  if (result.params && Object.keys(result.params).length > 0) {
-    activeTab.value = 'params'
-  } else if (result.headers && Object.keys(result.headers).length > 0) {
-    activeTab.value = 'headers'
-  } else if (result.body) {
-    activeTab.value = 'body'
-  } else {
-    activeTab.value = 'params'
-  }
-}
-
-function onResponseReceived() {
-  // 响应回来后不做特殊处理
-}
-
-async function convertToCase() {
-  openCaseModal()
 }
 </script>
 
 <style scoped>
-.dashboard {
+.ai-workspace {
   height: calc(100vh - var(--header-height) - 28px - 32px);
   overflow-y: auto;
   display: flex;
@@ -282,152 +168,145 @@ async function convertToCase() {
   padding: 16px;
 }
 
-.parser-panel {
-  flex-shrink: 0;
-}
-
-.panel-header {
+.ai-canvas {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border-default);
-  background: var(--bg-tertiary);
-  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.panel-title {
-  font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.prompt {
-  color: var(--secondary);
-  margin-right: 8px;
-}
-
-.request-config {
-  padding: 16px;
-  background: var(--bg-card);
+/* Floating Card Base */
+.floating-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  transition: all var(--transition-normal);
 }
 
-.config-tabs {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 12px;
-  border-bottom: 1px solid var(--border-default);
-  padding-bottom: 0;
+.floating-card:hover {
+  box-shadow: var(--shadow-card-hover);
 }
 
-.config-tabs button {
+/* Response Section */
+.response-section {
+  padding: 16px 20px;
+}
+
+.section-header {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  color: var(--text-secondary);
-  font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
-.config-tabs button.active {
-  color: var(--primary);
-  background: var(--primary-muted);
-  border-bottom-color: var(--primary);
+.section-icon {
+  font-size: 18px;
 }
 
-.config-tabs button:hover:not(.active) {
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
   color: var(--text-primary);
-  background: var(--bg-card);
+  flex: 1;
 }
 
-.tab-count {
-  background: var(--bg-card);
-  color: var(--text-secondary);
-  padding: 1px 6px;
-  border-radius: 10px;
+.response-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-badge {
   font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--bg-card-hover);
 }
 
-.config-tabs button.active .tab-count {
-  background: var(--primary);
-  color: white;
+.status-badge.success {
+  background: var(--success-muted);
+  color: var(--success);
 }
 
-.tab-pane {
-  padding: 4px 0;
+.status-badge.warning {
+  background: var(--warning-muted);
+  color: var(--warning);
 }
 
-.response-wrapper {
-  position: relative;
+.status-badge.error {
+  background: var(--error-muted);
+  color: var(--error);
 }
 
+.duration-badge {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+}
+
+/* Case Modal */
 .case-modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
+  inset: 0;
+  background: rgba(15, 18, 28, 0.88);
+  backdrop-filter: blur(32px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 99999;
 }
 
 .case-modal {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
+  background: rgba(15, 18, 28, 0.95);
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-xl);
-  width: 600px;
+  border-radius: 24px;
+  width: 560px;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
   box-shadow: var(--shadow-xl);
+  overflow: hidden;
 }
 
 .case-modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  padding: 20px 24px;
   border-bottom: 1px solid var(--border-default);
 }
 
 .case-modal-header h3 {
   margin: 0;
   font-size: 16px;
+  font-weight: 600;
   color: var(--text-primary);
 }
 
 .case-modal-close {
-  background: none;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
   border: none;
+  border-radius: 8px;
   color: var(--text-secondary);
-  font-size: 24px;
+  font-size: 18px;
   cursor: pointer;
-  line-height: 1;
+  transition: all var(--transition-fast);
 }
 
 .case-modal-close:hover {
+  background: var(--bg-card-hover);
   color: var(--text-primary);
 }
 
 .case-modal-body {
-  padding: 20px;
+  padding: 24px;
   overflow-y: auto;
   flex: 1;
 }
@@ -436,20 +315,20 @@ async function convertToCase() {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  padding: 16px 20px;
+  padding: 16px 24px;
   border-top: 1px solid var(--border-default);
 }
 
 .form-group {
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .form-group label {
   display: block;
   margin-bottom: 6px;
   font-size: 12px;
-  color: var(--text-secondary);
   font-weight: 500;
+  color: var(--text-secondary);
 }
 
 .form-group input,
@@ -459,11 +338,12 @@ async function convertToCase() {
   padding: 10px 12px;
   background: var(--bg-card);
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   color: var(--text-primary);
   font-size: 13px;
-  box-sizing: border-box;
+  font-family: var(--font-body);
   transition: all var(--transition-fast);
+  box-sizing: border-box;
 }
 
 .form-group input:focus,
@@ -477,7 +357,7 @@ async function convertToCase() {
 .form-row {
   display: flex;
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .form-row .form-group {
@@ -486,5 +366,32 @@ async function convertToCase() {
 
 .form-row .flex-1 {
   flex: 1;
+}
+
+.btn {
+  padding: 10px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+.btn.primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.btn.primary:hover {
+  background: var(--primary-hover);
 }
 </style>
