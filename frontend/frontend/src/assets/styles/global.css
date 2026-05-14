@@ -1,0 +1,142 @@
+@import './variables.css';
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #app {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Inter', 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 13px;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* 输入框 */
+input, textarea {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  padding: 6px 10px;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+input:focus, textarea:focus {
+  border-color: var(--accent-blue);
+}
+input::placeholder, textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* 按钮 */
+button {
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background: var(--gradient-primary);
+  color: white;
+}
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+.btn-secondary {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-hover);
+}
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+.btn-danger:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+/* 面板 */
+.panel {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+}
+
+/* 毛玻璃效果 */
+.glass {
+  background: rgba(17, 24, 39, 0.85);
+  backdrop-filter: blur(12px);
+}
+
+/* 方法标签颜色 */
+.method-get { color: var(--method-get); }
+.method-post { color: var(--method-post); }
+.method-put { color: var(--method-put); }
+.method-delete { color: var(--method-delete); }
+.method-patch { color: var(--method-patch); }
+.method-options { color: var(--method-options); }
+.method-head { color: var(--method-head); }
+
+/* 状态码颜色 */
+.status-2xx { color: var(--success); }
+.status-3xx { color: var(--info); }
+.status-4xx { color: var(--warning); }
+.status-5xx { color: var(--danger); }
+
+/* Element Plus 深色覆盖 */
+.el-input__wrapper {
+  background-color: var(--bg-tertiary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: none !important;
+}
+.el-input__inner {
+  color: var(--text-primary) !important;
+}
+.el-select__wrapper {
+  background-color: var(--bg-tertiary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: none !important;
+}
+.el-popper {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+}

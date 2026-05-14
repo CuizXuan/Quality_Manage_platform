@@ -1,0 +1,272 @@
+2026-04-30 00:45:42 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:43 [    INFO] httpx - HTTP Request: POST http://testserver/api/cases "HTTP/1.1 200 OK"
+2026-04-30 00:45:44 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:44 [    INFO] httpx - HTTP Request: GET http://testserver/api/cases?skip=0&limit=10 "HTTP/1.1 200 OK"
+2026-04-30 00:45:44 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:44 [    INFO] httpx - HTTP Request: GET http://testserver/api/cases/273 "HTTP/1.1 200 OK"
+2026-04-30 00:45:45 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:45 [    INFO] httpx - HTTP Request: PUT http://testserver/api/cases/273 "HTTP/1.1 200 OK"
+2026-04-30 00:45:45 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:45 [    INFO] httpx - HTTP Request: DELETE http://testserver/api/cases/274 "HTTP/1.1 200 OK"
+2026-04-30 00:45:45 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:46 [    INFO] httpx - HTTP Request: GET http://testserver/api/cases/274 "HTTP/1.1 404 Not Found"
+2026-04-30 00:45:46 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:46 [   DEBUG] httpcore.connection - connect_tcp.started host='httpbin.org' port=443 local_address=None timeout=30 socket_options=None
+2026-04-30 00:45:46 [   DEBUG] httpcore.connection - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x7982a08b8ec0>
+2026-04-30 00:45:46 [   DEBUG] httpcore.connection - start_tls.started ssl_context=<ssl.SSLContext object at 0x7982a0801c70> server_hostname='httpbin.org' timeout=30
+2026-04-30 00:45:46 [   DEBUG] httpcore.connection - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x7982a19d0050>
+2026-04-30 00:45:46 [   DEBUG] httpcore.http11 - send_request_headers.started request=<Request [b'GET']>
+2026-04-30 00:45:46 [   DEBUG] httpcore.http11 - send_request_headers.complete
+2026-04-30 00:45:46 [   DEBUG] httpcore.http11 - send_request_body.started request=<Request [b'GET']>
+2026-04-30 00:45:46 [   DEBUG] httpcore.http11 - send_request_body.complete
+2026-04-30 00:45:46 [   DEBUG] httpcore.http11 - receive_response_headers.started request=<Request [b'GET']>
+2026-04-30 00:45:47 [   DEBUG] httpcore.http11 - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Wed, 29 Apr 2026 16:45:47 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'346'), (b'Connection', b'keep-alive'), (b'Server', b'gunicorn/19.9.0'), (b'Access-Control-Allow-Origin', b'*'), (b'Access-Control-Allow-Credentials', b'true')])
+2026-04-30 00:45:47 [    INFO] httpx - HTTP Request: GET https://httpbin.org/get "HTTP/1.1 200 OK"
+2026-04-30 00:45:47 [   DEBUG] httpcore.http11 - receive_response_body.started request=<Request [b'GET']>
+2026-04-30 00:45:47 [   DEBUG] httpcore.http11 - receive_response_body.complete
+2026-04-30 00:45:47 [   DEBUG] httpcore.http11 - response_closed.started
+2026-04-30 00:45:47 [   DEBUG] httpcore.http11 - response_closed.complete
+2026-04-30 00:45:47 [   DEBUG] httpcore.connection - close.started
+2026-04-30 00:45:47 [   DEBUG] httpcore.connection - close.complete
+2026-04-30 00:45:47 [    INFO] httpx - HTTP Request: POST http://testserver/api/cases/274/run "HTTP/1.1 200 OK"
+2026-04-30 00:45:48 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:48 [    INFO] httpx - HTTP Request: POST http://testserver/api/cases/batch-delete "HTTP/1.1 200 OK"
+2026-04-30 00:45:48 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:48 [    INFO] httpx - HTTP Request: GET http://testserver/api/cases/274 "HTTP/1.1 404 Not Found"
+2026-04-30 00:45:48 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:48 [    INFO] httpx - HTTP Request: GET http://testserver/api/cases/275 "HTTP/1.1 404 Not Found"
+2026-04-30 00:45:48 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:48 [    INFO] httpx - HTTP Request: GET http://testserver/api/cases/276 "HTTP/1.1 404 Not Found"
+2026-04-30 00:45:48 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:48 [   DEBUG] httpcore.connection - connect_tcp.started host='httpbin.org' port=443 local_address=None timeout=30 socket_options=None
+2026-04-30 00:45:49 [   DEBUG] httpcore.connection - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x7982a19d16d0>
+2026-04-30 00:45:49 [   DEBUG] httpcore.connection - start_tls.started ssl_context=<ssl.SSLContext object at 0x7982a08dfcf0> server_hostname='httpbin.org' timeout=30
+2026-04-30 00:45:49 [   DEBUG] httpcore.connection - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x7982a1987950>
+2026-04-30 00:45:49 [   DEBUG] httpcore.http11 - send_request_headers.started request=<Request [b'GET']>
+2026-04-30 00:45:49 [   DEBUG] httpcore.http11 - send_request_headers.complete
+2026-04-30 00:45:49 [   DEBUG] httpcore.http11 - send_request_body.started request=<Request [b'GET']>
+2026-04-30 00:45:49 [   DEBUG] httpcore.http11 - send_request_body.complete
+2026-04-30 00:45:49 [   DEBUG] httpcore.http11 - receive_response_headers.started request=<Request [b'GET']>
+2026-04-30 00:45:49 [   DEBUG] httpcore.http11 - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Wed, 29 Apr 2026 16:45:49 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'346'), (b'Connection', b'keep-alive'), (b'Server', b'gunicorn/19.9.0'), (b'Access-Control-Allow-Origin', b'*'), (b'Access-Control-Allow-Credentials', b'true')])
+2026-04-30 00:45:49 [    INFO] httpx - HTTP Request: GET https://httpbin.org/get "HTTP/1.1 200 OK"
+2026-04-30 00:45:49 [   DEBUG] httpcore.http11 - receive_response_body.started request=<Request [b'GET']>
+2026-04-30 00:45:49 [   DEBUG] httpcore.http11 - receive_response_body.complete
+2026-04-30 00:45:49 [   DEBUG] httpcore.http11 - response_closed.started
+2026-04-30 00:45:49 [   DEBUG] httpcore.http11 - response_closed.complete
+2026-04-30 00:45:49 [   DEBUG] httpcore.connection - close.started
+2026-04-30 00:45:49 [   DEBUG] httpcore.connection - close.complete
+2026-04-30 00:45:50 [    INFO] httpx - HTTP Request: POST http://testserver/api/cases/274/run "HTTP/1.1 200 OK"
+2026-04-30 00:45:50 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:50 [   DEBUG] httpcore.connection - connect_tcp.started host='httpbin.org' port=443 local_address=None timeout=30 socket_options=None
+2026-04-30 00:45:50 [   DEBUG] httpcore.connection - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x7982a06ddcd0>
+2026-04-30 00:45:50 [   DEBUG] httpcore.connection - start_tls.started ssl_context=<ssl.SSLContext object at 0x7982a08dc9b0> server_hostname='httpbin.org' timeout=30
+2026-04-30 00:45:51 [   DEBUG] httpcore.connection - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x7982a0889b50>
+2026-04-30 00:45:51 [   DEBUG] httpcore.http11 - send_request_headers.started request=<Request [b'GET']>
+2026-04-30 00:45:51 [   DEBUG] httpcore.http11 - send_request_headers.complete
+2026-04-30 00:45:51 [   DEBUG] httpcore.http11 - send_request_body.started request=<Request [b'GET']>
+2026-04-30 00:45:51 [   DEBUG] httpcore.http11 - send_request_body.complete
+2026-04-30 00:45:51 [   DEBUG] httpcore.http11 - receive_response_headers.started request=<Request [b'GET']>
+2026-04-30 00:45:51 [   DEBUG] httpcore.http11 - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Wed, 29 Apr 2026 16:45:51 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'346'), (b'Connection', b'keep-alive'), (b'Server', b'gunicorn/19.9.0'), (b'Access-Control-Allow-Origin', b'*'), (b'Access-Control-Allow-Credentials', b'true')])
+2026-04-30 00:45:51 [    INFO] httpx - HTTP Request: GET https://httpbin.org/get "HTTP/1.1 200 OK"
+2026-04-30 00:45:51 [   DEBUG] httpcore.http11 - receive_response_body.started request=<Request [b'GET']>
+2026-04-30 00:45:51 [   DEBUG] httpcore.http11 - receive_response_body.complete
+2026-04-30 00:45:51 [   DEBUG] httpcore.http11 - response_closed.started
+2026-04-30 00:45:51 [   DEBUG] httpcore.http11 - response_closed.complete
+2026-04-30 00:45:51 [   DEBUG] httpcore.connection - close.started
+2026-04-30 00:45:51 [   DEBUG] httpcore.connection - close.complete
+2026-04-30 00:45:52 [    INFO] httpx - HTTP Request: POST http://testserver/api/cases/274/run "HTTP/1.1 200 OK"
+2026-04-30 00:45:52 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:52 [    INFO] httpx - HTTP Request: GET http://testserver/api/cases?folder=/api/user "HTTP/1.1 200 OK"
+2026-04-30 00:45:53 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:53 [    INFO] httpx - HTTP Request: GET http://testserver/api/cases?method=POST "HTTP/1.1 200 OK"
+2026-04-30 00:45:53 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:53 [    INFO] httpx - HTTP Request: GET http://testserver/api/cases?keyword=%E7%99%BB%E5%BD%95 "HTTP/1.1 200 OK"
+2026-04-30 00:45:53 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:54 [    INFO] httpx - HTTP Request: GET http://testserver/api/cases?folder=/api/user&method=POST&keyword=%E7%99%BB%E5%BD%95 "HTTP/1.1 200 OK"
+2026-04-30 00:45:54 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:54 [    INFO] httpx - HTTP Request: GET http://testserver/api/cases?limit=10 "HTTP/1.1 200 OK"
+2026-04-30 00:45:54 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:55 [    INFO] httpx - HTTP Request: POST http://testserver/api/cases/287/duplicate "HTTP/1.1 200 OK"
+2026-04-30 00:45:55 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:55 [    INFO] httpx - HTTP Request: POST http://testserver/api/cases/289/duplicate "HTTP/1.1 200 OK"
+2026-04-30 00:45:55 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:56 [    INFO] httpx - HTTP Request: PUT http://testserver/api/cases/291 "HTTP/1.1 200 OK"
+2026-04-30 00:45:56 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:56 [    INFO] httpx - HTTP Request: PUT http://testserver/api/cases/291 "HTTP/1.1 200 OK"
+2026-04-30 00:45:56 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:57 [    INFO] httpx - HTTP Request: PUT http://testserver/api/cases/291 "HTTP/1.1 200 OK"
+2026-04-30 00:45:57 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:57 [   DEBUG] httpcore.connection - connect_tcp.started host='httpbin.org' port=443 local_address=None timeout=30 socket_options=None
+2026-04-30 00:45:57 [   DEBUG] httpcore.connection - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x7982a19ef680>
+2026-04-30 00:45:57 [   DEBUG] httpcore.connection - start_tls.started ssl_context=<ssl.SSLContext object at 0x7982a071e210> server_hostname='httpbin.org' timeout=30
+2026-04-30 00:45:58 [   DEBUG] httpcore.connection - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x7982a19ef020>
+2026-04-30 00:45:58 [   DEBUG] httpcore.http11 - send_request_headers.started request=<Request [b'GET']>
+2026-04-30 00:45:58 [   DEBUG] httpcore.http11 - send_request_headers.complete
+2026-04-30 00:45:58 [   DEBUG] httpcore.http11 - send_request_body.started request=<Request [b'GET']>
+2026-04-30 00:45:58 [   DEBUG] httpcore.http11 - send_request_body.complete
+2026-04-30 00:45:58 [   DEBUG] httpcore.http11 - receive_response_headers.started request=<Request [b'GET']>
+2026-04-30 00:45:58 [   DEBUG] httpcore.http11 - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Wed, 29 Apr 2026 16:45:58 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'346'), (b'Connection', b'keep-alive'), (b'Server', b'gunicorn/19.9.0'), (b'Access-Control-Allow-Origin', b'*'), (b'Access-Control-Allow-Credentials', b'true')])
+2026-04-30 00:45:58 [    INFO] httpx - HTTP Request: GET https://httpbin.org/get "HTTP/1.1 200 OK"
+2026-04-30 00:45:58 [   DEBUG] httpcore.http11 - receive_response_body.started request=<Request [b'GET']>
+2026-04-30 00:45:58 [   DEBUG] httpcore.http11 - receive_response_body.complete
+2026-04-30 00:45:58 [   DEBUG] httpcore.http11 - response_closed.started
+2026-04-30 00:45:58 [   DEBUG] httpcore.http11 - response_closed.complete
+2026-04-30 00:45:58 [   DEBUG] httpcore.connection - close.started
+2026-04-30 00:45:58 [   DEBUG] httpcore.connection - close.complete
+2026-04-30 00:45:58 [    INFO] httpx - HTTP Request: POST http://testserver/api/cases/291/run "HTTP/1.1 200 OK"
+2026-04-30 00:45:58 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:45:58 [   DEBUG] httpcore.connection - connect_tcp.started host='httpbin.org' port=443 local_address=None timeout=30 socket_options=None
+2026-04-30 00:45:59 [   DEBUG] httpcore.connection - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x7982a0754c50>
+2026-04-30 00:45:59 [   DEBUG] httpcore.connection - start_tls.started ssl_context=<ssl.SSLContext object at 0x7982a075c2d0> server_hostname='httpbin.org' timeout=30
+2026-04-30 00:45:59 [   DEBUG] httpcore.connection - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x7982a0754f50>
+2026-04-30 00:45:59 [   DEBUG] httpcore.http11 - send_request_headers.started request=<Request [b'POST']>
+2026-04-30 00:45:59 [   DEBUG] httpcore.http11 - send_request_headers.complete
+2026-04-30 00:45:59 [   DEBUG] httpcore.http11 - send_request_body.started request=<Request [b'POST']>
+2026-04-30 00:45:59 [   DEBUG] httpcore.http11 - send_request_body.complete
+2026-04-30 00:45:59 [   DEBUG] httpcore.http11 - receive_response_headers.started request=<Request [b'POST']>
+2026-04-30 00:45:59 [   DEBUG] httpcore.http11 - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Wed, 29 Apr 2026 16:45:59 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'486'), (b'Connection', b'keep-alive'), (b'Server', b'gunicorn/19.9.0'), (b'Access-Control-Allow-Origin', b'*'), (b'Access-Control-Allow-Credentials', b'true')])
+2026-04-30 00:45:59 [    INFO] httpx - HTTP Request: POST https://httpbin.org/post "HTTP/1.1 200 OK"
+2026-04-30 00:45:59 [   DEBUG] httpcore.http11 - receive_response_body.started request=<Request [b'POST']>
+2026-04-30 00:45:59 [   DEBUG] httpcore.http11 - receive_response_body.complete
+2026-04-30 00:45:59 [   DEBUG] httpcore.http11 - response_closed.started
+2026-04-30 00:45:59 [   DEBUG] httpcore.http11 - response_closed.complete
+2026-04-30 00:45:59 [   DEBUG] httpcore.connection - close.started
+2026-04-30 00:45:59 [   DEBUG] httpcore.connection - close.complete
+2026-04-30 00:46:00 [    INFO] httpx - HTTP Request: POST http://testserver/api/cases/291/run "HTTP/1.1 200 OK"
+2026-04-30 00:46:00 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:00 [   DEBUG] httpcore.connection - connect_tcp.started host='httpbin.org' port=443 local_address=None timeout=30 socket_options=None
+2026-04-30 00:46:00 [   DEBUG] httpcore.connection - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x7982a08ec230>
+2026-04-30 00:46:00 [   DEBUG] httpcore.connection - start_tls.started ssl_context=<ssl.SSLContext object at 0x7982a075cd70> server_hostname='httpbin.org' timeout=30
+2026-04-30 00:46:01 [   DEBUG] httpcore.connection - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x7982a08eeb70>
+2026-04-30 00:46:01 [   DEBUG] httpcore.http11 - send_request_headers.started request=<Request [b'GET']>
+2026-04-30 00:46:01 [   DEBUG] httpcore.http11 - send_request_headers.complete
+2026-04-30 00:46:01 [   DEBUG] httpcore.http11 - send_request_body.started request=<Request [b'GET']>
+2026-04-30 00:46:01 [   DEBUG] httpcore.http11 - send_request_body.complete
+2026-04-30 00:46:01 [   DEBUG] httpcore.http11 - receive_response_headers.started request=<Request [b'GET']>
+2026-04-30 00:46:01 [   DEBUG] httpcore.http11 - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Wed, 29 Apr 2026 16:46:01 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'346'), (b'Connection', b'keep-alive'), (b'Server', b'gunicorn/19.9.0'), (b'Access-Control-Allow-Origin', b'*'), (b'Access-Control-Allow-Credentials', b'true')])
+2026-04-30 00:46:01 [    INFO] httpx - HTTP Request: GET https://httpbin.org/get "HTTP/1.1 200 OK"
+2026-04-30 00:46:01 [   DEBUG] httpcore.http11 - receive_response_body.started request=<Request [b'GET']>
+2026-04-30 00:46:01 [   DEBUG] httpcore.http11 - receive_response_body.complete
+2026-04-30 00:46:01 [   DEBUG] httpcore.http11 - response_closed.started
+2026-04-30 00:46:01 [   DEBUG] httpcore.http11 - response_closed.complete
+2026-04-30 00:46:01 [   DEBUG] httpcore.connection - close.started
+2026-04-30 00:46:01 [   DEBUG] httpcore.connection - close.complete
+2026-04-30 00:46:01 [    INFO] httpx - HTTP Request: POST http://testserver/api/cases/291/run "HTTP/1.1 200 OK"
+2026-04-30 00:46:02 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:02 [    INFO] httpx - HTTP Request: GET http://testserver/api/cases/99999 "HTTP/1.1 404 Not Found"
+2026-04-30 00:46:02 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:02 [    INFO] httpx - HTTP Request: PUT http://testserver/api/cases/99999 "HTTP/1.1 404 Not Found"
+2026-04-30 00:46:02 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:02 [    INFO] httpx - HTTP Request: DELETE http://testserver/api/cases/99999 "HTTP/1.1 404 Not Found"
+2026-04-30 00:46:02 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:02 [    INFO] httpx - HTTP Request: POST http://testserver/api/cases/99999/duplicate "HTTP/1.1 404 Not Found"
+2026-04-30 00:46:02 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:02 [    INFO] httpx - HTTP Request: POST http://testserver/api/cases/99999/run "HTTP/1.1 404 Not Found"
+2026-04-30 00:46:02 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:03 [    INFO] httpx - HTTP Request: POST http://testserver/api/defects "HTTP/1.1 200 OK"
+2026-04-30 00:46:03 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:03 [    INFO] httpx - HTTP Request: POST http://testserver/api/defects "HTTP/1.1 200 OK"
+2026-04-30 00:46:03 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:04 [    INFO] httpx - HTTP Request: GET http://testserver/api/defects/17 "HTTP/1.1 200 OK"
+2026-04-30 00:46:04 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:04 [    INFO] httpx - HTTP Request: PUT http://testserver/api/defects/17 "HTTP/1.1 200 OK"
+2026-04-30 00:46:05 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:05 [    INFO] httpx - HTTP Request: DELETE http://testserver/api/defects/17 "HTTP/1.1 200 OK"
+2026-04-30 00:46:05 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:05 [    INFO] httpx - HTTP Request: GET http://testserver/api/defects/17 "HTTP/1.1 404 Not Found"
+2026-04-30 00:46:05 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:05 [    INFO] httpx - HTTP Request: PUT http://testserver/api/defects/17 "HTTP/1.1 200 OK"
+2026-04-30 00:46:05 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:06 [    INFO] httpx - HTTP Request: PUT http://testserver/api/defects/17 "HTTP/1.1 200 OK"
+2026-04-30 00:46:06 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:06 [    INFO] httpx - HTTP Request: PUT http://testserver/api/defects/17 "HTTP/1.1 200 OK"
+2026-04-30 00:46:06 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:06 [    INFO] httpx - HTTP Request: GET http://testserver/api/defects?status=open "HTTP/1.1 200 OK"
+2026-04-30 00:46:07 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:07 [    INFO] httpx - HTTP Request: GET http://testserver/api/defects?severity=high "HTTP/1.1 200 OK"
+2026-04-30 00:46:08 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:08 [    INFO] httpx - HTTP Request: GET http://testserver/api/defects?assignee=zhangsan "HTTP/1.1 200 OK"
+2026-04-30 00:46:08 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:08 [    INFO] httpx - HTTP Request: GET http://testserver/api/defects?keyword=%E7%99%BB%E5%BD%95 "HTTP/1.1 200 OK"
+2026-04-30 00:46:09 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:09 [    INFO] httpx - HTTP Request: GET http://testserver/api/defects?status=open&severity=high&assignee=wangwu "HTTP/1.1 200 OK"
+2026-04-30 00:46:09 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:09 [    INFO] httpx - HTTP Request: PUT http://testserver/api/defects/18 "HTTP/1.1 200 OK"
+2026-04-30 00:46:09 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:10 [    INFO] httpx - HTTP Request: GET http://testserver/api/defects "HTTP/1.1 200 OK"
+2026-04-30 00:46:10 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:10 [    INFO] httpx - HTTP Request: POST http://testserver/api/defects/17/comments "HTTP/1.1 200 OK"
+2026-04-30 00:46:10 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:10 [    INFO] httpx - HTTP Request: POST http://testserver/api/defects/99999/comments "HTTP/1.1 404 Not Found"
+2026-04-30 00:46:11 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:11 [    INFO] httpx - HTTP Request: GET http://testserver/api/defects/17 "HTTP/1.1 200 OK"
+2026-04-30 00:46:11 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:11 [   DEBUG] python_multipart.multipart - Calling on_part_begin with no data
+2026-04-30 00:46:11 [   DEBUG] python_multipart.multipart - Calling on_header_field with data[36:55]
+2026-04-30 00:46:11 [   DEBUG] python_multipart.multipart - Calling on_header_value with data[57:106]
+2026-04-30 00:46:11 [   DEBUG] python_multipart.multipart - Calling on_header_end with no data
+2026-04-30 00:46:11 [   DEBUG] python_multipart.multipart - Calling on_header_field with data[108:120]
+2026-04-30 00:46:11 [   DEBUG] python_multipart.multipart - Calling on_header_value with data[122:131]
+2026-04-30 00:46:11 [   DEBUG] python_multipart.multipart - Calling on_header_end with no data
+2026-04-30 00:46:11 [   DEBUG] python_multipart.multipart - Calling on_headers_finished with no data
+2026-04-30 00:46:11 [   DEBUG] python_multipart.multipart - Calling on_part_data with data[135:243]
+2026-04-30 00:46:11 [   DEBUG] python_multipart.multipart - Calling on_part_end with no data
+2026-04-30 00:46:11 [   DEBUG] python_multipart.multipart - Calling on_end with no data
+2026-04-30 00:46:11 [    INFO] httpx - HTTP Request: POST http://testserver/api/defects/17/attachments "HTTP/1.1 200 OK"
+2026-04-30 00:46:12 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:12 [   DEBUG] python_multipart.multipart - Calling on_part_begin with no data
+2026-04-30 00:46:12 [   DEBUG] python_multipart.multipart - Calling on_header_field with data[36:55]
+2026-04-30 00:46:12 [   DEBUG] python_multipart.multipart - Calling on_header_value with data[57:100]
+2026-04-30 00:46:12 [   DEBUG] python_multipart.multipart - Calling on_header_end with no data
+2026-04-30 00:46:12 [   DEBUG] python_multipart.multipart - Calling on_header_field with data[102:114]
+2026-04-30 00:46:12 [   DEBUG] python_multipart.multipart - Calling on_header_value with data[116:125]
+2026-04-30 00:46:12 [   DEBUG] python_multipart.multipart - Calling on_header_end with no data
+2026-04-30 00:46:12 [   DEBUG] python_multipart.multipart - Calling on_headers_finished with no data
+2026-04-30 00:46:12 [   DEBUG] python_multipart.multipart - Calling on_part_data with data[129:133]
+2026-04-30 00:46:12 [   DEBUG] python_multipart.multipart - Calling on_part_end with no data
+2026-04-30 00:46:12 [   DEBUG] python_multipart.multipart - Calling on_end with no data
+2026-04-30 00:46:12 [    INFO] httpx - HTTP Request: POST http://testserver/api/defects/99999/attachments "HTTP/1.1 404 Not Found"
+2026-04-30 00:46:12 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:12 [    INFO] httpx - HTTP Request: GET http://testserver/api/defects/17 "HTTP/1.1 200 OK"
+2026-04-30 00:46:12 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:13 [    INFO] httpx - HTTP Request: POST http://testserver/api/defects/from-execution "HTTP/1.1 200 OK"
+2026-04-30 00:46:13 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:13 [    INFO] httpx - HTTP Request: POST http://testserver/api/defects/from-execution "HTTP/1.1 200 OK"
+2026-04-30 00:46:14 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:14 [    INFO] httpx - HTTP Request: GET http://testserver/api/defects/stats/summary "HTTP/1.1 200 OK"
+2026-04-30 00:46:14 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:14 [    INFO] httpx - HTTP Request: GET http://testserver/api/defects/stats/summary "HTTP/1.1 200 OK"
+2026-04-30 00:46:14 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:15 [    INFO] httpx - HTTP Request: PUT http://testserver/api/defects/17 "HTTP/1.1 200 OK"
+2026-04-30 00:46:15 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:15 [    INFO] httpx - HTTP Request: PUT http://testserver/api/defects/17 "HTTP/1.1 200 OK"
+2026-04-30 00:46:15 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:16 [    INFO] httpx - HTTP Request: PUT http://testserver/api/defects/17 "HTTP/1.1 200 OK"
+2026-04-30 00:46:16 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:16 [    INFO] httpx - HTTP Request: PUT http://testserver/api/defects/17 "HTTP/1.1 200 OK"
+2026-04-30 00:46:16 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:16 [    INFO] httpx - HTTP Request: PUT http://testserver/api/defects/99999 "HTTP/1.1 404 Not Found"
+2026-04-30 00:46:16 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:17 [    INFO] httpx - HTTP Request: DELETE http://testserver/api/defects/99999 "HTTP/1.1 404 Not Found"
+2026-04-30 00:46:17 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:17 [    INFO] httpx - HTTP Request: GET http://testserver/api/health "HTTP/1.1 200 OK"
+2026-04-30 00:46:17 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:17 [    INFO] httpx - HTTP Request: GET http://testserver/api/projects "HTTP/1.1 401 Unauthorized"
+2026-04-30 00:46:17 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:17 [    INFO] httpx - HTTP Request: GET http://testserver/api/projects "HTTP/1.1 200 OK"
+2026-04-30 00:46:17 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:17 [    INFO] httpx - HTTP Request: POST http://testserver/api/projects "HTTP/1.1 400 Bad Request"
+2026-04-30 00:46:17 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:17 [    INFO] httpx - HTTP Request: POST http://testserver/api/projects "HTTP/1.1 400 Bad Request"
+2026-04-30 00:46:17 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:17 [    INFO] httpx - HTTP Request: GET http://testserver/api/projects/99999 "HTTP/1.1 404 Not Found"
+2026-04-30 00:46:17 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:17 [    INFO] httpx - HTTP Request: POST http://testserver/api/projects "HTTP/1.1 400 Bad Request"
+2026-04-30 00:46:17 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:18 [    INFO] httpx - HTTP Request: POST http://testserver/api/projects "HTTP/1.1 400 Bad Request"
+2026-04-30 00:46:18 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:18 [    INFO] httpx - HTTP Request: GET http://testserver/api/scenarios "HTTP/1.1 401 Unauthorized"
+2026-04-30 00:46:18 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:18 [    INFO] httpx - HTTP Request: GET http://testserver/api/scenarios "HTTP/1.1 200 OK"
+2026-04-30 00:46:18 [   DEBUG] asyncio - Using selector: EpollSelector
+2026-04-30 00:46:18 [    INFO] httpx - HTTP Request: POST http://testserver/api/scenarios "HTTP/1.1 200 OK"
