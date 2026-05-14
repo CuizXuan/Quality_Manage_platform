@@ -888,3 +888,85 @@ pre, code, .json-content {
   font-size: 13px;
   color: var(--text-primary);
 }
+
+/* El-Dialog 深色主题适配 - 使用 @layer 确保优先级 */
+@layer overrides {
+  .el-dialog {
+    --el-dialog-bg-color: var(--bg-panel, #0d0d14) !important;
+    --el-text-color-primary: var(--text-primary, #e0e0e0) !important;
+    background: var(--bg-panel, #0d0d14) !important;
+    border: 1px solid var(--neon-cyan, #0ff) !important;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.3) !important;
+  }
+
+  .el-dialog__header {
+    border-bottom: 1px solid var(--border-default, rgba(0, 255, 255, 0.2)) !important;
+    padding: 16px 20px !important;
+    background: transparent !important;
+  }
+
+  .el-dialog__title {
+    font-family: var(--font-title, 'Orbitron', sans-serif) !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    letter-spacing: 2px !important;
+    color: var(--neon-cyan, #0ff) !important;
+  }
+
+  .el-dialog__headerbtn .el-dialog__close {
+    color: var(--text-secondary, #888) !important;
+  }
+
+  .el-dialog__headerbtn:hover .el-dialog__close {
+    color: var(--neon-cyan, #0ff) !important;
+  }
+
+  .el-dialog__body {
+    color: var(--text-primary, #e0e0e0) !important;
+    padding: 20px !important;
+    background: transparent !important;
+  }
+
+  .el-dialog__footer {
+    border-top: 1px solid var(--border-default, rgba(0, 255, 255, 0.2)) !important;
+    padding: 16px 20px !important;
+    background: transparent !important;
+  }
+
+  .el-form-item__label {
+    color: var(--text-secondary, #888) !important;
+  }
+
+  .el-input__wrapper {
+    background: var(--bg-secondary, #0a0a0f) !important;
+    border-color: var(--border-default, rgba(0, 255, 255, 0.2)) !important;
+    box-shadow: none !important;
+  }
+
+  .el-input__wrapper:hover {
+    border-color: var(--neon-cyan, #0ff) !important;
+  }
+
+  .el-input__wrapper.is-focus {
+    border-color: var(--neon-cyan, #0ff) !important;
+    box-shadow: 0 0 0 2px rgba(0, 255, 255, 0.2) !important;
+  }
+
+  .el-input__inner {
+    color: var(--text-primary, #e0e0e0) !important;
+  }
+
+  .el-input-number {
+    --el-input-bg-color: var(--bg-secondary, #0a0a0f) !important;
+    --el-input-border-color: var(--border-default, rgba(0, 255, 255, 0.2)) !important;
+    --el-input-text-color: var(--text-primary, #e0e0e0) !important;
+  }
+
+  .el-input-number .el-input__wrapper {
+    background: var(--bg-secondary, #0a0a0f) !important;
+  }
+
+  .el-form-item {
+    --el-form-label-font-color: var(--text-secondary, #888) !important;
+  }
+}
