@@ -4,7 +4,7 @@
       <h1 class="page-title">AI 模型配置</h1>
       <div class="header-actions">
         <button class="btn-secondary" @click="refreshProviders">🔄 刷新</button>
-        <button class="btn-primary" @click="showAddDialog = true">+ 添加模型</button>
+        <button class="btn-primary" @click="openAddDialog">+ 添加模型</button>
       </div>
     </div>
 
@@ -47,7 +47,15 @@
               <button class="btn-icon" @click="testConnection(cfg)" title="测试连接">🧪</button>
               <button class="btn-icon" @click="editConfig(cfg)" title="编辑">✏️</button>
               <button v-if="!cfg.is_default" class="btn-icon" @click="setDefault(cfg.id)" title="设为默认">⭐</button>
-              <button class="btn-icon danger" @click="deleteConfig(cfg.id)" title="删除">🗑</button>
+              <CyberConfirm
+                title="确认删除该配置？"
+                danger
+                @confirm="deleteConfig(cfg.id)"
+              >
+                <template #trigger>
+                  <button class="btn-icon danger" title="删除">🗑</button>
+                </template>
+              </CyberConfirm>
             </div>
           </div>
           <div class="card-body">
@@ -108,85 +116,85 @@
     </div>
 
     <!-- 添加/编辑弹窗 -->
-    <div v-if="showAddDialog" class="modal-overlay" @click.self="closeDialog">
-      <div class="modal config-modal">
-        <div class="modal-header">
-          <h2>{{ editingId ? '编辑模型配置' : '添加模型配置' }}</h2>
-          <button class="btn-close" @click="closeDialog">×</button>
+    <CyberModal
+      v-model="showAddDialog"
+      :title="editingId ? '编辑模型配置' : '添加模型配置'"
+      :subtitle="editingId ? '修改模型配置信息' : '配置新的 AI 模型供应商'"
+      size="large"
+      intent="ai"
+      :confirm-text="editingId ? '保存' : '添加'"
+      :loading="saving"
+      @confirm="saveConfig"
+    >
+      <div class="form-group">
+        <label class="form-label">配置名称 *</label>
+        <input v-model="form.name" type="text" class="form-input" placeholder="例如: MiniMax M2.7" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">供应商 *</label>
+          <select v-model="form.provider" class="form-select" @change="onProviderChange">
+            <option value="">请选择</option>
+            <option v-for="(info, key) in providerInfo" :key="key" :value="key">
+              {{ info.name }}
+            </option>
+          </select>
         </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label>配置名称 *</label>
-            <input v-model="form.name" type="text" placeholder="例如: MiniMax M2.7" />
-          </div>
-
-          <div class="form-group">
-            <label>供应商 *</label>
-            <select v-model="form.provider" @change="onProviderChange">
-              <option value="">请选择</option>
-              <option v-for="(info, key) in providerInfo" :key="key" :value="key">
-                {{ info.name }}
-              </option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>API Key *</label>
-            <input v-model="form.api_key" type="password" placeholder="请输入 API Key" />
-          </div>
-
-          <div class="form-group" v-if="form.provider === 'minimax'">
-            <label>Group ID (MiniMax 专用) *</label>
-            <input v-model="form.group_id" type="text" placeholder="请输入 Group ID" />
-            <small>Group ID 不是 API Key。<a href="https://www.minimaxi.com/user-space/basic-setting/interface-key" target="_blank" style="color: var(--neon-cyan)">点击获取 Group ID →</a></small>
-          </div>
-
-          <div class="form-group">
-            <label>模型名称 *</label>
-            <select v-model="form.model" v-if="selectedProviderInfo?.models?.length">
-              <option value="">请选择</option>
-              <option v-for="m in selectedProviderInfo.models" :key="m" :value="m">{{ m }}</option>
-            </select>
-            <input v-else v-model="form.model" type="text" placeholder="请输入模型名称" />
-          </div>
-
-          <div class="form-group">
-            <label>Base URL（可选）</label>
-            <input v-model="form.base_url" type="text" :placeholder="selectedProviderInfo?.default_base_url || '留空使用默认地址'" />
-            <small>留空则使用供应商默认地址，自建代理时可填写</small>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Temperature</label>
-              <input v-model.number="form.temperature" type="number" min="0" max="10" />
-            </div>
-            <div class="form-group">
-              <label>Max Tokens</label>
-              <input v-model.number="form.max_tokens" type="number" min="256" max="128000" />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="checkbox-item">
-              <input type="checkbox" v-model="form.is_default" />
-              <span>设为默认模型</span>
-            </label>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn-secondary" @click="closeDialog">取消</button>
-          <button class="btn-primary" @click="saveConfig">
-            {{ editingId ? '保存修改' : '添加' }}
-          </button>
+        <div class="form-group">
+          <label class="form-label">模型名称 *</label>
+          <select v-model="form.model" class="form-select" v-if="selectedProviderInfo?.models?.length">
+            <option value="">请选择</option>
+            <option v-for="m in selectedProviderInfo.models" :key="m" :value="m">{{ m }}</option>
+          </select>
+          <input v-else v-model="form.model" type="text" class="form-input" placeholder="请输入模型名称" />
         </div>
       </div>
-    </div>
+
+      <div class="form-group">
+        <label class="form-label">API Key *</label>
+        <input v-model="form.api_key" type="password" class="form-input" placeholder="请输入 API Key" />
+      </div>
+
+      <div class="form-group" v-if="form.provider === 'minimax'">
+        <label class="form-label">Group ID (MiniMax 专用) *</label>
+        <input v-model="form.group_id" type="text" class="form-input" placeholder="请输入 Group ID" />
+        <small class="form-hint">
+          Group ID 不是 API Key。<a href="https://www.minimaxi.com/user-space/basic-setting/interface-key" target="_blank" class="form-link">点击获取 Group ID →</a>
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Base URL（可选）</label>
+        <input v-model="form.base_url" type="text" class="form-input" :placeholder="selectedProviderInfo?.default_base_url || '留空使用默认地址'" />
+        <small class="form-hint">留空则使用供应商默认地址，自建代理时可填写</small>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Temperature</label>
+          <input v-model.number="form.temperature" type="number" class="form-input" min="0" max="10" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Max Tokens</label>
+          <input v-model.number="form.max_tokens" type="number" class="form-input" min="256" max="128000" />
+        </div>
+      </div>
+
+      <div class="form-group form-group--checkbox">
+        <label class="form-checkbox">
+          <input type="checkbox" v-model="form.is_default" />
+          <span class="checkbox-label">设为默认模型</span>
+        </label>
+      </div>
+    </CyberModal>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
+import CyberModal from '@/components/common/modal/CyberModal.vue'
+import CyberConfirm from '@/components/common/CyberConfirm.vue'
 
 const API_BASE = '/api'
 
@@ -198,6 +206,7 @@ const loading = ref(false)
 const configs = ref([])
 const showAddDialog = ref(false)
 const editingId = ref(null)
+const saving = ref(false)
 const testResults = ref({})
 const providerInfo = ref({})
 
@@ -258,12 +267,21 @@ function onProviderChange() {
   form.base_url = selectedProviderInfo.value?.default_base_url || ''
 }
 
+function openAddDialog() {
+  editingId.value = null
+  Object.assign(form, {
+    name: '', provider: '', api_key: '', model: '',
+    base_url: '', group_id: '', temperature: 7, max_tokens: 4096, is_default: false,
+  })
+  showAddDialog.value = true
+}
+
 function editConfig(cfg) {
   editingId.value = cfg.id
   Object.assign(form, {
     name: cfg.name,
     provider: cfg.provider,
-    api_key: '', // 不回填 key
+    api_key: '',
     model: cfg.model,
     base_url: cfg.base_url || '',
     group_id: cfg.group_id || '',
@@ -275,6 +293,7 @@ function editConfig(cfg) {
 }
 
 async function saveConfig() {
+  saving.value = true
   try {
     const token = localStorage.getItem('access_token')
     const authH = token ? { Authorization: 'Bearer ' + token } : {}
@@ -299,10 +318,13 @@ async function saveConfig() {
       alert('保存失败: ' + (result.detail || result.error))
       return
     }
-    closeDialog()
+    showAddDialog.value = false
+    editingId.value = null
     loadConfigs()
   } catch (e) {
     alert('保存失败: ' + e.message)
+  } finally {
+    saving.value = false
   }
 }
 
@@ -354,7 +376,6 @@ async function setDefault(id) {
 }
 
 async function deleteConfig(id) {
-  if (!confirm('确定删除该配置？')) return
   try {
     const res = await fetch(API_BASE + '/ai/models/configs/' + id, { method: 'DELETE', headers: { Authorization: 'Bearer ' + (localStorage.getItem('access_token') || '') } })
     const r = await res.json()
@@ -366,15 +387,6 @@ async function deleteConfig(id) {
   } catch (e) {
     alert('删除失败')
   }
-}
-
-function closeDialog() {
-  showAddDialog.value = false
-  editingId.value = null
-  Object.assign(form, {
-    name: '', provider: '', api_key: '', model: '',
-    base_url: '', group_id: '', temperature: 7, max_tokens: 4096, is_default: false,
-  })
 }
 
 function getProviderName(key) {
@@ -651,118 +663,137 @@ function maskGroupId(id) {
   color: var(--text-secondary);
 }
 
-/* 弹窗 */
-.modal-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal {
-  background: var(--bg-panel);
-  border: 1px solid var(--neon-cyan);
-  border-radius: 16px;
-  width: 90%;
-  max-width: 560px;
-  max-height: 80vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.config-modal {
-  max-width: 600px;
-}
-
-.modal-header {
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border-default);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.modal-header h2 {
-  margin: 0;
-  font-size: 18px;
-}
-
-.btn-close {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: var(--text-secondary);
-}
-
-.modal-body {
-  padding: 24px;
-  overflow-y: auto;
-  flex: 1;
-}
-
-.modal-footer {
-  padding: 16px 24px;
-  border-top: 1px solid var(--border-default);
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
+/* Form Styles for CyberModal */
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
-.form-group label {
-  display: block;
-  font-weight: 500;
-  margin-bottom: 6px;
-  color: var(--text-secondary);
-  font-size: 13px;
+.form-group:last-child {
+  margin-bottom: 0;
 }
 
-.form-group input,
-.form-group select {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid var(--border-default);
-  border-radius: 6px;
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  font-size: 14px;
-  box-sizing: border-box;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: var(--neon-cyan);
-  box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
-}
-
-.form-group small {
-  display: block;
-  font-size: 11px;
-  color: var(--text-secondary);
-  margin-top: 4px;
+.form-group--checkbox {
+  margin-top: -6px;
 }
 
 .form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  display: flex;
+  gap: 12px;
 }
 
-.checkbox-item {
+.form-row .form-group {
+  flex: 1;
+}
+
+.form-label {
+  display: block;
+  font-family: var(--font-title, 'Orbitron', sans-serif);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--modal-text-secondary, #888);
+  margin-bottom: 8px;
+}
+
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-secondary, #0a0a0f);
+  border: 1px solid var(--modal-border, rgba(0, 255, 255, 0.22));
+  border-radius: 4px;
+  color: var(--modal-text-primary, #e0e0e0);
+  font-family: var(--font-mono, 'Fira Code', monospace);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+.form-input:focus,
+.form-select:focus {
+  border-color: var(--modal-ai-accent, #00f0ff);
+  box-shadow: 0 0 0 2px rgba(0, 240, 255, 0.15);
+}
+
+.form-input::placeholder {
+  color: var(--modal-text-muted, #666);
+}
+
+.form-select {
+  cursor: pointer;
+}
+
+.form-hint {
+  display: block;
+  font-size: 11px;
+  color: var(--modal-text-muted, #666);
+  margin-top: 6px;
+}
+
+.form-link {
+  color: var(--modal-ai-accent, #00f0ff);
+  text-decoration: none;
+}
+
+.form-link:hover {
+  text-decoration: underline;
+}
+
+.form-checkbox {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.form-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--modal-ai-accent, #00f0ff);
+}
+
+.checkbox-label {
+  font-family: var(--font-title, 'Orbitron', sans-serif);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--modal-text-primary, #e0e0e0);
+}
+
+/* Buttons */
+.btn-primary {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+  padding: 10px 20px;
+  background: var(--bg-secondary);
+  color: var(--neon-cyan);
+  border: 1px solid var(--neon-cyan);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
 }
 
 .empty-state {

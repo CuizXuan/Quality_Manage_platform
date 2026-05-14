@@ -25,45 +25,62 @@
       <AIActivityStream />
     </div>
 
-    <!-- Case Modal (reuse existing) -->
-    <div v-if="showCaseModal" class="case-modal-overlay" @click.self="closeCaseModal">
-      <div class="case-modal" role="dialog" aria-modal="true">
-        <div class="case-modal-header">
-          <h3>新建用例</h3>
-          <button class="case-modal-close" aria-label="关闭弹窗" @click="closeCaseModal">×</button>
+    <!-- Case Modal -->
+    <CyberModal
+      v-model="showCaseModal"
+      title="新建用例"
+      subtitle="从 API 终端快速创建测试用例"
+      size="large"
+      confirm-text="创建"
+      :loading="saving"
+      @confirm="saveCaseFromModal"
+      @cancel="closeCaseModal"
+    >
+      <div class="form-row">
+        <div class="form-group form-group--shrink">
+          <label class="form-label">请求方法</label>
+          <select v-model="caseModalForm.method" class="form-select">
+            <option v-for="m in ['GET','POST','PUT','DELETE','PATCH']" :key="m" :value="m">{{ m }}</option>
+          </select>
         </div>
-        <div class="case-modal-body">
-          <div class="form-group">
-            <label>名称</label>
-            <input v-model="caseModalForm.name" placeholder="用例名称" />
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>请求方法</label>
-              <select v-model="caseModalForm.method">
-                <option v-for="m in ['GET','POST','PUT','DELETE','PATCH']" :key="m" :value="m">{{ m }}</option>
-              </select>
-            </div>
-            <div class="form-group flex-1">
-              <label>请求地址</label>
-              <input v-model="caseModalForm.url" placeholder="https://api.example.com/path" />
-            </div>
-          </div>
-          <div class="form-group">
-            <label>所属分类</label>
-            <input v-model="caseModalForm.folder_path" placeholder="/用户模块/登录" />
-          </div>
-          <div class="form-group">
-            <label>描述</label>
-            <textarea v-model="caseModalForm.description" rows="2" placeholder="用例描述..."></textarea>
-          </div>
-        </div>
-        <div class="case-modal-footer">
-          <button class="btn" @click="closeCaseModal">取消</button>
-          <button class="btn primary" @click="saveCaseFromModal">创建</button>
+        <div class="form-group flex-1">
+          <label class="form-label">请求地址</label>
+          <input
+            v-model="caseModalForm.url"
+            class="form-input"
+            placeholder="https://api.example.com/path"
+          />
         </div>
       </div>
-    </div>
+
+      <div class="form-group">
+        <label class="form-label">用例名称</label>
+        <input
+          v-model="caseModalForm.name"
+          class="form-input"
+          placeholder="用例名称"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">所属分类</label>
+        <input
+          v-model="caseModalForm.folder_path"
+          class="form-input"
+          placeholder="/用户模块/登录"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">描述</label>
+        <textarea
+          v-model="caseModalForm.description"
+          class="form-textarea"
+          rows="2"
+          placeholder="用例描述..."
+        ></textarea>
+      </div>
+    </CyberModal>
   </div>
 </template>
 
@@ -76,11 +93,13 @@ import RequestComposer from '@/components/request/RequestComposer.vue'
 import AIInsightGrid from '@/components/ai/AIInsightGrid.vue'
 import ResponsePanel from '@/components/response/ResponsePanel.vue'
 import AIActivityStream from '@/components/ai/AIActivityStream.vue'
+import CyberModal from '@/components/common/modal/CyberModal.vue'
 
 const requestStore = useRequestStore()
 const caseStore = useCaseStore()
 
 const showCaseModal = ref(false)
+const saving = ref(false)
 const caseModalForm = ref(defaultCaseForm())
 
 const statusClass = computed(() => {
@@ -137,6 +156,7 @@ async function saveCaseFromModal() {
     ElMessage.warning('请填写请求地址')
     return
   }
+  saving.value = true
   try {
     const caseData = {
       name: caseModalForm.value.name.trim(),
@@ -154,8 +174,13 @@ async function saveCaseFromModal() {
     closeCaseModal()
   } catch (err) {
     ElMessage.error('用例创建失败: ' + (err.message || err))
+  } finally {
+    saving.value = false
   }
 }
+
+// 暴露给外部调用
+defineExpose({ openCaseModal })
 </script>
 
 <style scoped>
@@ -246,152 +271,80 @@ async function saveCaseFromModal() {
   color: var(--text-tertiary);
 }
 
-/* Case Modal */
-.case-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 18, 28, 0.88);
-  backdrop-filter: blur(32px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 99999;
-}
-
-.case-modal {
-  background: rgba(15, 18, 28, 0.95);
-  border: 1px solid var(--border-default);
-  border-radius: 24px;
-  width: 560px;
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  box-shadow: var(--shadow-xl);
-  overflow: hidden;
-}
-
-.case-modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border-default);
-}
-
-.case-modal-header h3 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.case-modal-close {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-card);
-  border: none;
-  border-radius: 8px;
-  color: var(--text-secondary);
-  font-size: 18px;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.case-modal-close:hover {
-  background: var(--bg-card-hover);
-  color: var(--text-primary);
-}
-
-.case-modal-body {
-  padding: 24px;
-  overflow-y: auto;
-  flex: 1;
-}
-
-.case-modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  padding: 16px 24px;
-  border-top: 1px solid var(--border-default);
-}
-
-.form-group {
-  margin-bottom: 16px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: 10px 12px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: 13px;
-  font-family: var(--font-body);
-  transition: all var(--transition-fast);
-  box-sizing: border-box;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-muted);
-}
-
+/* Form Styles for CyberModal */
 .form-row {
   display: flex;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
-.form-row .form-group {
+.form-row:last-child {
   margin-bottom: 0;
 }
 
-.form-row .flex-1 {
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-group--shrink {
+  flex-shrink: 0;
+}
+
+.flex-1 {
   flex: 1;
+  min-width: 0;
 }
 
-.btn {
-  padding: 10px 20px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  color: var(--text-secondary);
+.form-label {
+  display: block;
+  font-family: var(--font-title, 'Orbitron', sans-serif);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--modal-text-secondary, #888);
+  margin-bottom: 8px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-secondary, #0a0a0f);
+  border: 1px solid var(--modal-border, rgba(0, 255, 255, 0.22));
+  border-radius: 4px;
+  color: var(--modal-text-primary, #e0e0e0);
+  font-family: var(--font-mono, 'Fira Code', monospace);
   font-size: 13px;
-  font-weight: 500;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: var(--modal-ai-accent, #00f0ff);
+  box-shadow: 0 0 0 2px rgba(0, 240, 255, 0.15);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: var(--modal-text-muted, #666);
+}
+
+.form-select {
   cursor: pointer;
-  transition: all var(--transition-fast);
+  min-width: 100px;
 }
 
-.btn:hover {
-  background: var(--bg-card-hover);
-  color: var(--text-primary);
-}
-
-.btn.primary {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: white;
-}
-
-.btn.primary:hover {
-  background: var(--primary-hover);
+.form-textarea {
+  resize: vertical;
+  min-height: 60px;
 }
 </style>

@@ -20,7 +20,7 @@
             <el-option label="↑ 升序" value="asc" />
           </el-select>
         </div>
-        <button class="btn primary" @click="editingCase = null; form = defaultForm(); showCreateModal = true">
+        <button class="btn primary" @click="openCreateModal">
           <span>+</span> 新建用例
         </button>
       </div>
@@ -29,87 +29,86 @@
     <!-- Tab 切换：用例列表 / 分类管理 -->
     <el-tabs v-model="activeTab" class="content-tabs cyber-tabs">
       <el-tab-pane label="用例列表" name="cases">
-        <!-- 文件夹树 + 用例列表 -->
         <div class="content">
           <!-- 左侧文件夹树 -->
           <div class="folder-tree panel">
-        <div class="panel-header">
-          <span class="panel-title">// 分类</span>
-        </div>
-        <div
-          class="tree-item root"
-          :class="{ active: selectedFolder === '/' }"
-          @click="selectFolder('/')"
-        >
-          <span class="folder-icon">◈</span>
-          全部用例 ({{ cases.length }})
-        </div>
-        <div v-for="folder in folderList" :key="folder.path"
-          class="tree-item"
-          :class="{ active: selectedFolder === folder.path }"
-          @click="selectFolder(folder.path)"
-        >
-          <span class="folder-icon">▤</span>
-          {{ folder.name }} ({{ folder.count }})
-        </div>
-      </div>
+            <div class="panel-header">
+              <span class="panel-title">// 分类</span>
+            </div>
+            <div
+              class="tree-item root"
+              :class="{ active: selectedFolder === '/' }"
+              @click="selectFolder('/')"
+            >
+              <span class="folder-icon">◈</span>
+              全部用例 ({{ cases.length }})
+            </div>
+            <div v-for="folder in folderList" :key="folder.path"
+              class="tree-item"
+              :class="{ active: selectedFolder === folder.path }"
+              @click="selectFolder(folder.path)"
+            >
+              <span class="folder-icon">▤</span>
+              {{ folder.name }} ({{ folder.count }})
+            </div>
+          </div>
 
-      <!-- 用例列表 -->
-      <div class="case-list panel">
-        <div class="panel-header">
-          <span class="panel-title">// 用例列表</span>
-        </div>
-        <div v-if="loading" class="loading">
-          <span class="loading-spinner">⟳</span>
-          <span>加载中...</span>
-        </div>
-        <div v-else-if="fetchError" class="empty" style="color:#F43F5E;">
-          <span>⚠ {{ fetchError }}</span>
-        </div>
-        <div v-else-if="filteredCases.length === 0" class="empty">
-          <span class="glitch">// 暂无数据</span>
-        </div>
-        <div v-else class="case-table">
-          <div class="table-header">
-            <span class="col-method">方法</span>
-            <span class="col-name">名称</span>
-            <span class="col-path">路径</span>
-            <span class="col-time">创建时间</span>
-            <span class="col-actions">操作</span>
+          <!-- 用例列表 -->
+          <div class="case-list panel">
+            <div class="panel-header">
+              <span class="panel-title">// 用例列表</span>
+            </div>
+            <div v-if="loading" class="loading">
+              <span class="loading-spinner">⟳</span>
+              <span>加载中...</span>
+            </div>
+            <div v-else-if="fetchError" class="empty" style="color:#F43F5E;">
+              <span>⚠ {{ fetchError }}</span>
+            </div>
+            <div v-else-if="filteredCases.length === 0" class="empty">
+              <span class="glitch">// 暂无数据</span>
+            </div>
+            <div v-else class="case-table">
+              <div class="table-header">
+                <span class="col-method">方法</span>
+                <span class="col-name">名称</span>
+                <span class="col-path">路径</span>
+                <span class="col-time">创建时间</span>
+                <span class="col-actions">操作</span>
+              </div>
+              <div v-for="c in filteredCases" :key="c.id" class="table-row" @click="openCase(c)">
+                <span class="col-method">
+                  <span class="method-badge" :class="'method-' + c.method.toLowerCase()">{{ c.method }}</span>
+                </span>
+                <span class="col-name">{{ c.name }}</span>
+                <span class="col-path">{{ c.folder_path }}</span>
+                <span class="col-time">{{ formatDate(c.created_at) }}</span>
+                <span class="col-actions" @click.stop>
+                  <button class="icon-btn" :class="{ loading: runningCaseId === c.id }" :disabled="runningCaseId === c.id" title="执行" @click="runCase(c)">
+                    <span v-if="runningCaseId === c.id" class="loading-spinner">⟳</span>
+                    <span v-else>▶</span>
+                  </button>
+                  <button class="icon-btn" :class="{ loading: duplicatingCaseId === c.id }" :disabled="duplicatingCaseId === c.id" title="复制" @click="duplicateCase(c.id)">
+                    <span v-if="duplicatingCaseId === c.id" class="loading-spinner">⟳</span>
+                    <span v-else>📋</span>
+                  </button>
+                  <CyberConfirm
+                    :ref="el => { if (el) cyberConfirmRefs[c.id] = el }"
+                    title="确认删除这个用例？"
+                    ok-text="删除"
+                    cancel-text="取消"
+                    danger
+                    :loading="deletingCaseId === c.id"
+                    @confirm="handleDelete(c.id)"
+                  >
+                    <template #trigger>
+                      <button class="icon-btn danger" title="删除">🗑</button>
+                    </template>
+                  </CyberConfirm>
+                </span>
+              </div>
+            </div>
           </div>
-          <div v-for="c in filteredCases" :key="c.id" class="table-row" @click="openCase(c)">
-            <span class="col-method">
-              <span class="method-badge" :class="'method-' + c.method.toLowerCase()">{{ c.method }}</span>
-            </span>
-            <span class="col-name">{{ c.name }}</span>
-            <span class="col-path">{{ c.folder_path }}</span>
-            <span class="col-time">{{ formatDate(c.created_at) }}</span>
-            <span class="col-actions" @click.stop>
-              <button class="icon-btn" :class="{ loading: runningCaseId === c.id }" :disabled="runningCaseId === c.id" title="执行" @click="runCase(c)">
-                <span v-if="runningCaseId === c.id" class="loading-spinner">⟳</span>
-                <span v-else>▶</span>
-              </button>
-              <button class="icon-btn" :class="{ loading: duplicatingCaseId === c.id }" :disabled="duplicatingCaseId === c.id" title="复制" @click="duplicateCase(c.id)">
-                <span v-if="duplicatingCaseId === c.id" class="loading-spinner">⟳</span>
-                <span v-else>📋</span>
-              </button>
-              <CyberConfirm
-                :ref="el => { if (el) cyberConfirmRefs[c.id] = el }"
-                title="确认删除这个用例？"
-                ok-text="删除"
-                cancel-text="取消"
-                danger
-                :loading="deletingCaseId === c.id"
-                @confirm="handleDelete(c.id)"
-              >
-                <template #trigger>
-                  <button class="icon-btn danger" title="删除">🗑</button>
-                </template>
-              </CyberConfirm>
-            </span>
-          </div>
-        </div>
-        </div>
         </div>
       </el-tab-pane>
       <el-tab-pane label="分类管理" name="folders">
@@ -118,52 +117,68 @@
     </el-tabs>
 
     <!-- 新建/编辑弹窗 -->
-    <div v-if="showCreateModal" class="case-modal-overlay" @click.self="showCreateModal = false">
-      <div class="case-modal" role="dialog" aria-modal="true" :aria-labelledby="'case-modal-title'">
-        <div class="case-modal-header">
-          <h3 :id="'case-modal-title'">{{ editingCase ? '编辑用例' : '新建用例' }}</h3>
-          <button class="case-modal-close" aria-label="关闭弹窗" @click="showCreateModal = false">×</button>
+    <CyberModal
+      v-model="showCreateModal"
+      :title="editingCase ? '编辑用例' : '新建用例'"
+      :subtitle="editingCase ? `正在编辑: ${editingCase.name}` : '创建新的测试用例'"
+      size="large"
+      :confirm-text="editingCase ? '保存' : '创建'"
+      :loading="saving"
+      @confirm="saveCase"
+    >
+      <div class="form-row">
+        <div class="form-group form-group--shrink">
+          <label class="form-label">请求方法 *</label>
+          <select v-model="form.method" class="form-select" :class="{ 'has-error': formErrors.method }">
+            <option v-for="m in ['GET','POST','PUT','DELETE','PATCH']" :key="m" :value="m">{{ m }}</option>
+          </select>
         </div>
-        <div class="case-modal-body">
-          <div class="form-group">
-            <label>名称*</label>
-            <input v-model="form.name" placeholder="用例名称" :style="formErrors.name ? 'border-color:#ff4d4f' : ''" />
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>请求方法*</label>
-              <select v-model="form.method" :style="formErrors.method ? 'border-color:#ff4d4f' : ''">
-                <option v-for="m in ['GET','POST','PUT','DELETE','PATCH']" :key="m" :value="m">{{ m }}</option>
-              </select>
-            </div>
-            <div class="form-group flex-1">
-              <label>请求地址*</label>
-              <input v-model="form.url" placeholder="https://api.example.com/path" :style="formErrors.url ? 'border-color:#ff4d4f' : ''" />
-            </div>
-          </div>
-          <div class="form-group">
-            <label>所属分类</label>
-            <input v-model="form.folder_path" placeholder="/用户模块/登录" />
-          </div>
-          <div class="form-group">
-            <label>描述</label>
-            <textarea v-model="form.description" rows="2" placeholder="用例描述..."></textarea>
-          </div>
-          <div class="form-group">
-            <label>请求头 (JSON)</label>
-            <textarea v-model="form.headers" rows="3" placeholder='{"Content-Type": "application/json"}'></textarea>
-          </div>
-          <div class="form-group">
-            <label>请求体</label>
-            <textarea v-model="form.request_body" rows="4" placeholder="请求体内容..."></textarea>
-          </div>
-        </div>
-        <div class="case-modal-footer">
-          <button class="btn" @click="showCreateModal = false">取消</button>
-          <button class="btn primary" @click="saveCase">{{ editingCase ? '保存' : '创建' }}</button>
+        <div class="form-group flex-1">
+          <label class="form-label">请求地址 *</label>
+          <input
+            v-model="form.url"
+            class="form-input"
+            placeholder="https://api.example.com/path"
+            :class="{ 'has-error': formErrors.url }"
+          />
         </div>
       </div>
-    </div>
+
+      <div class="form-group">
+        <label class="form-label">用例名称 *</label>
+        <input
+          v-model="form.name"
+          class="form-input"
+          placeholder="用例名称"
+          :class="{ 'has-error': formErrors.name }"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">所属分类</label>
+        <input v-model="form.folder_path" class="form-input" placeholder="/用户模块/登录" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">描述</label>
+        <textarea v-model="form.description" class="form-textarea" rows="2" placeholder="用例描述..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">请求头 (JSON)</label>
+        <textarea
+          v-model="form.headers"
+          class="form-textarea form-textarea--mono"
+          rows="3"
+          placeholder='{"Content-Type": "application/json"}'
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">请求体</label>
+        <textarea v-model="form.request_body" class="form-textarea" rows="4" placeholder="请求体内容..."></textarea>
+      </div>
+    </CyberModal>
   </div>
 </template>
 
@@ -171,18 +186,18 @@
 import { ref, computed, onMounted, onActivated, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessageBox, ElMessage } from 'element-plus'
-import { useCaseStore } from '../stores/caseStore'
-import { useRequestStore } from '../stores/request'
+import { useCaseStore } from '@/stores/caseStore'
+import { useRequestStore } from '@/stores/request'
 import { storeToRefs } from 'pinia'
 import CaseFolderManager from '@/components/CaseFolderManager.vue'
 import CyberConfirm from '@/components/common/CyberConfirm.vue'
+import CyberModal from '@/components/common/modal/CyberModal.vue'
 
 const router = useRouter()
 
 const caseStore = useCaseStore()
 const requestStore = useRequestStore()
 
-// ✅ 用 storeToRefs 保持响应式连接
 const { cases, folders, loading, fetchError } = storeToRefs(caseStore)
 
 const keyword = ref('')
@@ -192,23 +207,26 @@ const sortBy = ref('created_at')
 const sortOrder = ref('desc')
 const showCreateModal = ref(false)
 const editingCase = ref(null)
+const saving = ref(false)
 const form = ref(defaultForm())
 const formErrors = ref({ name: false, method: false, url: false })
 
 watch(showCreateModal, (val) => {
-  if (val) formErrors.value = { name: false, method: false, url: false }
+  if (val) {
+    formErrors.value = { name: false, method: false, url: false }
+  } else {
+    editingCase.value = null
+    form.value = defaultForm()
+  }
 })
 
-// ✅ 操作按钮 loading 状态追踪
-const runningCaseId = ref(null)    // 正在执行的用例
-const duplicatingCaseId = ref(null) // 正在复制的用例
-const deletingCaseId = ref(null)   // 正在删除的用例
+const runningCaseId = ref(null)
+const duplicatingCaseId = ref(null)
+const deletingCaseId = ref(null)
 
-// CyberConfirm 实例引用，用于手动控制关闭
 const cyberConfirmRefs = ref({})
 
 const folderList = computed(() => {
-  // 使用 store 中的 folders（来自 case-folders API）
   return folders.value.map(f => ({
     name: f.name,
     path: '/' + f.name,
@@ -272,7 +290,6 @@ function debounceSearch() {
   }, 300)
 }
 
-// 操作后按默认条件重新查询
 function refreshWithDefaults() {
   clearTimeout(searchTimer)
   keyword.value = ''
@@ -281,8 +298,13 @@ function refreshWithDefaults() {
   caseStore.fetchCases({ sort_by: 'created_at', order: 'desc' })
 }
 
+function openCreateModal() {
+  editingCase.value = null
+  form.value = defaultForm()
+  showCreateModal.value = true
+}
+
 async function saveCase() {
-  // 重置错误状态
   formErrors.value = { name: false, method: false, url: false }
   const missing = []
   if (!form.value.name?.trim()) {
@@ -297,6 +319,7 @@ async function saveCase() {
     ElMessage.warning(`请填写必填项：${missing.join('、')}`)
     return
   }
+  saving.value = true
   try {
     if (editingCase.value) {
       await caseStore.updateCase(editingCase.value.id, form.value)
@@ -306,13 +329,12 @@ async function saveCase() {
       ElMessage.success('用例创建成功')
     }
     showCreateModal.value = false
-    editingCase.value = null
-    form.value = defaultForm()
-    // 操作完成后按默认条件重新查询
     refreshWithDefaults()
   } catch (err) {
     ElMessage.error(editingCase.value ? '用例更新失败' : '用例创建失败')
     console.error('saveCase error:', err)
+  } finally {
+    saving.value = false
   }
 }
 
@@ -323,12 +345,11 @@ function openCase(c) {
 }
 
 async function runCase(c) {
-  // 校验用例信息完整性
-  if (!c.url || !c.url.trim()) {
+  if (!c.url?.trim()) {
     ElMessage.warning('用例 URL 为空，无法执行')
     return
   }
-  if (!c.method || !c.method.trim()) {
+  if (!c.method?.trim()) {
     ElMessage.warning('用例请求方法为空，无法执行')
     return
   }
@@ -345,17 +366,12 @@ async function runCase(c) {
     result = {}
   }
 
-  // result 结构: execute_case 返回值 { execution_id, case_id, status, response, ... }
-  // caseStore.runCase 返回 res.data，所以 result 已经是 execute_case 的返回值
   const execData = result || {}
   const resp = execData?.response || {}
-  // execute_case 返回的 status 是 "success" 或 "failure"
   const isSuccess = execData?.status === 'success'
   const error = apiError || execData?.error || resp.error || ''
   const reqBody = c.body || c.request_body || ''
   const reqHeaders = typeof c.headers === 'object' ? JSON.stringify(c.headers) : (c.headers || '')
-
-  console.log('[CaseManagement] isSuccess:', isSuccess, 'resp:', resp)
 
   await ElMessageBox.alert(
     `<div class="run-result">
@@ -380,7 +396,6 @@ async function runCase(c) {
   )
   runningCaseId.value = null
 
-  // 执行成功后跳转到执行历史页面
   if (isSuccess) {
     router.push('/history')
   }
@@ -397,7 +412,6 @@ async function duplicateCase(id) {
   try {
     const newCase = await caseStore.duplicateCase(id)
     ElMessage.success(`用例复制成功 【${newCase?.name}】`)
-    // 操作完成后按默认条件重新查询
     refreshWithDefaults()
   } catch (err) {
     ElMessage.error('用例复制失败')
@@ -409,18 +423,14 @@ async function duplicateCase(id) {
 
 async function handleDelete(id) {
   deletingCaseId.value = id
-  // CyberConfirm 已在 confirm 时自动关闭弹窗，这里手动关闭实例引用
   try {
     await caseStore.deleteCase(id)
     ElMessage.success('删除成功')
-    // 清理实例引用
     nextTick(() => { delete cyberConfirmRefs[id] })
-    // 操作完成后按默认条件重新查询
     refreshWithDefaults()
   } catch (err) {
     ElMessage.error('删除失败')
     console.error('handleDelete error:', err)
-    // 删除失败也要关闭弹窗
     nextTick(() => {
       if (cyberConfirmRefs[id]) {
         cyberConfirmRefs[id].close()
@@ -437,7 +447,6 @@ onMounted(() => {
   caseStore.fetchFolders()
 })
 
-// keep-alive 场景下：每次激活都重新拉取数据
 onActivated(() => {
   caseStore.fetchCases()
 })
@@ -664,86 +673,90 @@ onActivated(() => {
   color: var(--neon-cyan);
 }
 
-/* ========================================
-   CASE MODAL - 组件化命名，隔离全局样式污染
-   参照 Ant Design Modal 规范
-   ======================================== */
-
-/* 遮罩层 - Ant Design 规范 rgba(0,0,0,0.45) */
-.case-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
-
-/* 弹窗主体 - 12px 圆角符合 Ant Design 大弹窗规范 */
-.case-modal {
-  background: var(--bg-panel);
-  border: 1px solid var(--neon-cyan);
-  box-shadow:
-    0 0 30px rgba(0, 255, 255, 0.3),
-    inset 0 0 60px rgba(0, 255, 255, 0.05);
-  width: 560px;
-  max-height: 80vh;
-  overflow-y: auto;
-  border-radius: 12px;  /* Ant Design 大弹窗圆角 */
-}
-
-/* 禁用 panel 角落装饰（装饰在模态框中不需要） */
-.case-modal::before,
-.case-modal::after {
-  display: none;
-}
-
-/* 标题区 */
-.case-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border-default);
-}
-
-.case-modal-header h3 {
-  font-family: var(--font-title);
-  font-size: 18px;  /* Ant Design 标题 18px */
-  font-weight: 600;
-  letter-spacing: 2px;
-  color: var(--neon-cyan);
-  margin: 0;
-}
-
-/* 关闭按钮 */
-.case-modal-close {
-  background: none;
-  border: none;
-  font-size: 20px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: color var(--transition-fast);
-}
-
-.case-modal-close:hover {
-  color: var(--neon-pink);
-}
-
-/* 内容区 */
-.case-modal-body {
-  padding: 20px;
-}
-
-/* 底部按钮区 */
-.case-modal-footer {
+/* Form Styles for CyberModal */
+.form-row {
   display: flex;
   gap: 12px;
-  justify-content: flex-end;  /* 主按钮在右 */
-  padding: 16px 20px;
-  border-top: 1px solid var(--border-default);
+  margin-bottom: 18px;
+}
+
+.form-row:last-child {
+  margin-bottom: 0;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-group--shrink {
+  flex-shrink: 0;
+}
+
+.flex-1 {
+  flex: 1;
+  min-width: 0;
+}
+
+.form-label {
+  display: block;
+  font-family: var(--font-title, 'Orbitron', sans-serif);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--modal-text-secondary, #888);
+  margin-bottom: 8px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-secondary, #0a0a0f);
+  border: 1px solid var(--modal-border, rgba(0, 255, 255, 0.22));
+  border-radius: 4px;
+  color: var(--modal-text-primary, #e0e0e0);
+  font-family: var(--font-mono, 'Fira Code', monospace);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: var(--modal-ai-accent, #00f0ff);
+  box-shadow: 0 0 0 2px rgba(0, 240, 255, 0.15);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: var(--modal-text-muted, #666);
+}
+
+.form-input.has-error,
+.form-select.has-error {
+  border-color: var(--modal-danger-accent, #ff4d7d);
+}
+
+.form-select {
+  cursor: pointer;
+  min-width: 100px;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.form-textarea--mono {
+  font-family: var(--font-mono, monospace);
 }
 
 @keyframes glitch {
@@ -760,11 +773,7 @@ onActivated(() => {
   to { transform: rotate(360deg); }
 }
 
-/* ========================================
-   深色主题适配 - Element Plus 组件
-   ======================================== */
-
-/* el-select 下拉框适配 */
+/* Element Plus overrides */
 :deep(.el-select) {
   --el-fill-color-blank: var(--bg-secondary, #1a1a2e);
   --el-text-color-regular: var(--neon-cyan, #00ffd5);
@@ -803,7 +812,6 @@ onActivated(() => {
   font-weight: 600;
 }
 
-/* el-tabs 标签页适配 */
 :deep(.el-tabs) {
   --el-tabs-header-height: 40px;
 }
@@ -844,67 +852,5 @@ onActivated(() => {
 :deep(.el-tabs__content) {
   padding: 0;
   overflow: hidden;
-}
-
-/* el-table 表格适配 */
-:deep(.el-table) {
-  --el-table-bg-color: var(--bg-panel, #16162a);
-  --el-table-tr-bg-color: var(--bg-panel, #16162a);
-  --el-table-header-bg-color: rgba(0, 255, 255, 0.05);
-  --el-table-header-text-color: var(--neon-cyan, #00ffd5);
-  --el-table-text-color: var(--text-primary, #e0e0e0);
-  --el-table-border-color: var(--border-default, #2a2a4a);
-  --el-table-row-hover-bg-color: rgba(0, 255, 255, 0.05);
-  font-family: var(--font-mono, monospace);
-}
-
-:deep(.el-table th.el-table__cell) {
-  background-color: rgba(0, 255, 255, 0.05) !important;
-  color: var(--neon-cyan, #00ffd5) !important;
-  font-family: var(--font-title, sans-serif);
-  font-size: 11px;
-  letter-spacing: 1px;
-  font-weight: 600;
-  border-bottom: 1px solid var(--border-default, #2a2a4a) !important;
-}
-
-:deep(.el-table td.el-table__cell) {
-  border-bottom: 1px solid var(--border-default, #2a2a4a) !important;
-}
-
-:deep(.el-table__body tr) {
-  background-color: var(--bg-panel, #16162a) !important;
-}
-
-:deep(.el-table__body tr:hover > td.el-table__cell) {
-  background-color: rgba(0, 255, 255, 0.05) !important;
-}
-
-:deep(.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell) {
-  background: rgba(0, 255, 255, 0.02);
-}
-
-:deep(.el-table .cell) {
-  color: var(--text-primary, #e0e0e0);
-}
-
-/* el-button 按钮适配 */
-:deep(.el-button--primary) {
-  --el-button-bg-color: var(--neon-cyan, #00ffd5);
-  --el-button-border-color: var(--neon-cyan, #00ffd5);
-  --el-button-text-color: #0a0a1a;
-  --el-button-hover-bg-color: rgba(0, 255, 255, 0.8);
-  --el-button-hover-border-color: rgba(0, 255, 253, 0.8);
-  --el-button-hover-text-color: #0a0a1a;
-}
-
-:deep(.el-button--small) {
-  font-family: var(--font-title, sans-serif);
-  letter-spacing: 1px;
-  font-size: 11px;
-}
-
-:deep(.el-button + .el-button) {
-  margin-left: 8px;
 }
 </style>
