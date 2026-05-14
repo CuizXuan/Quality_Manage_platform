@@ -3,7 +3,7 @@
     <div class="toolbar">
       <el-button type="primary" size="small" @click="dialogRef?.open()">+ 新增分类</el-button>
     </div>
-    <el-table :data="folders" stripe v-loading="loading" class="mt-2">
+    <el-table :data="folders" v-loading="loading" class="cyber-table mt-2">
       <el-table-column prop="name" label="分类名称" min-width="150" />
       <el-table-column prop="sort_order" label="排序" width="100" />
       <el-table-column label="操作" width="150" fixed="right">
@@ -65,6 +65,57 @@ onMounted(fetchFolders)
 
 <style scoped>
 .folder-manager { padding: 0; }
-.toolbar { margin-bottom: 8px; }
+.toolbar {
+  margin-bottom: 8px;
+  padding-top: 16px;
+}
 .mt-2 { margin-top: 8px; }
+
+:deep(.el-table) {
+  --el-table-bg-color: var(--bg-panel, #0d0d14);
+  --el-table-tr-bg-color: var(--bg-panel, #0d0d14);
+  --el-table-header-bg-color: var(--bg-secondary, #0a0a0f);
+  --el-table-header-text-color: var(--neon-cyan, #0ff);
+  --el-table-text-color: var(--text-primary, #e0e0e0);
+  --el-table-border-color: var(--border-default, rgba(0, 255, 255, 0.2));
+  --el-table-row-hover-bg-color: rgba(0, 255, 255, 0.05);
+  --el-table-header-row-hover-bg-color: rgba(0, 255, 255, 0.05);
+}
+
+:deep(.el-table th.el-table__cell) {
+  background: var(--bg-secondary, #0a0a0f) !important;
+  color: var(--neon-cyan, #0ff) !important;
+  font-family: var(--font-title, 'Orbitron', sans-serif);
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+:deep(.el-table td.el-table__cell) {
+  background: var(--bg-panel, #0d0d14) !important;
+  color: var(--text-primary, #e0e0e0) !important;
+  border-color: var(--border-default, rgba(0, 255, 255, 0.2)) !important;
+}
+
+:deep(.el-table__body tr:hover > td.el-table__cell) {
+  background: rgba(0, 255, 255, 0.05) !important;
+}
+
+:deep(.el-button--primary) {
+  --el-button-bg-color: var(--neon-cyan, #0ff);
+  --el-button-border-color: var(--neon-cyan, #0ff);
+  --el-button-text-color: #000;
+  background: var(--neon-cyan, #0ff);
+  border-color: var(--neon-cyan, #0ff);
+  color: #000;
+}
+
+:deep(.el-button--primary:hover) {
+  background: var(--neon-cyan-light, #00f0ff);
+  border-color: var(--neon-cyan-light, #00f0ff);
+  color: #000;
+}
+
+:deep(.el-button--danger) {
+  color: var(--neon-magenta, #f0f);
+}
 </style>

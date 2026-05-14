@@ -10,12 +10,22 @@
       <div class="toolbar-right">
         <input v-model="keyword" placeholder="搜索用例..." class="search-input" @input="debounceSearch" />
         <div style="display: flex; gap: 8px; align-items: center;">
-          <el-select v-model="sortBy" style="width: 130px" @change="debounceSearch">
+          <el-select
+            v-model="sortBy"
+            style="width: 130px"
+            popper-class="case-sort-select-popper"
+            @change="debounceSearch"
+          >
             <el-option label="按名称" value="name" />
             <el-option label="按创建时间" value="created_at" />
             <el-option label="按ID" value="id" />
           </el-select>
-          <el-select v-model="sortOrder" style="width: 100px" @change="debounceSearch">
+          <el-select
+            v-model="sortOrder"
+            style="width: 100px"
+            popper-class="case-sort-select-popper"
+            @change="debounceSearch"
+          >
             <el-option label="↓ 降序" value="desc" />
             <el-option label="↑ 升序" value="asc" />
           </el-select>
@@ -852,5 +862,114 @@ onActivated(() => {
 :deep(.el-tabs__content) {
   padding: 0;
   overflow: hidden;
+}
+
+/* 排序下拉框深色主题适配 */
+:deep(.el-select) {
+  --el-select-border-color-hover: var(--neon-cyan, #0ff);
+  --el-select-input-focus-border-color: var(--neon-cyan, #0ff);
+}
+
+:deep(.el-select .el-select__wrapper) {
+  background-color: var(--bg-secondary, #0a0a0f) !important;
+  box-shadow: 0 0 0 1px var(--border-default, rgba(0, 255, 255, 0.2)) !important;
+  min-height: 32px !important;
+  padding: 0 8px !important;
+}
+
+:deep(.el-select .el-select__wrapper:hover) {
+  box-shadow: 0 0 0 1px var(--neon-cyan, #0ff) !important;
+}
+
+:deep(.el-select .el-select__wrapper.is-focused) {
+  box-shadow: 0 0 0 1px var(--neon-cyan, #0ff) !important;
+}
+
+:deep(.el-select .el-select__input) {
+  color: var(--neon-cyan, #0ff) !important;
+}
+
+:deep(.el-select-dropdown) {
+  background-color: var(--bg-panel, #0d0d14) !important;
+  border: 1px solid var(--border-default, rgba(0, 255, 255, 0.2)) !important;
+}
+
+:deep(.el-select-dropdown__item) {
+  color: var(--text-primary, #e0e0e0) !important;
+  background-color: transparent !important;
+}
+
+:deep(.el-select-dropdown__item:hover) {
+  background-color: rgba(0, 255, 255, 0.1) !important;
+}
+
+:deep(.el-select-dropdown__item.is-selected) {
+  color: var(--neon-cyan, #0ff) !important;
+  background-color: rgba(0, 255, 255, 0.15) !important;
+  font-weight: 600 !important;
+}
+
+:deep(.el-popper.is-light) {
+  background: var(--bg-panel, #0d0d14) !important;
+  border-color: var(--border-default, rgba(0, 255, 255, 0.2)) !important;
+}
+
+:deep(.el-popper.is-light .el-popper__arrow::before) {
+  background: var(--bg-panel, #0d0d14) !important;
+  border-color: var(--border-default, rgba(0, 255, 255, 0.2)) !important;
+}
+
+/* 全局下拉弹窗深色主题适配 */
+:deep(.el-select-dropdown) {
+  background: var(--bg-panel, #0d0d14) !important;
+  border: 1px solid var(--border-default, rgba(0, 255, 255, 0.2)) !important;
+}
+
+:deep(.el-select-dropdown .el-select-dropdown__item) {
+  background: transparent !important;
+  color: var(--text-primary, #e0e0e0) !important;
+}
+
+:deep(.el-select-dropdown .el-select-dropdown__item:hover) {
+  background: rgba(0, 255, 255, 0.1) !important;
+}
+
+:deep(.el-select-dropdown .el-select-dropdown__item.is-selected) {
+  color: var(--neon-cyan, #0ff) !important;
+  background: rgba(0, 255, 255, 0.15) !important;
+}
+
+/* popper 深色适配 */
+:deep(.el-popper) {
+  background: var(--bg-panel, #0d0d14) !important;
+  border-color: var(--border-default, rgba(0, 255, 255, 0.2)) !important;
+}
+
+:deep(.el-popper .el-popper__arrow::before) {
+  background: var(--bg-panel, #0d0d14) !important;
+  border-color: var(--border-default, rgba(0, 255, 255, 0.2)) !important;
+}
+
+/* 覆盖 Element Plus 默认的 popper 样式 */
+:deep(.el-select-dropdown__popper) {
+  --el-bg-color-overlay: var(--bg-panel, #0d0d14) !important;
+  --el-text-color-regular: var(--text-primary, #e0e0e0) !important;
+}
+
+:deep(.el-select-dropdown__popper .el-scrollbar) {
+  background: var(--bg-panel, #0d0d14) !important;
+}
+
+:deep(.el-select-dropdown__popper .el-select-dropdown__item) {
+  background: transparent !important;
+  color: var(--text-primary, #e0e0e0) !important;
+}
+
+:deep(.el-select-dropdown__popper .el-select-dropdown__item:hover) {
+  background: rgba(0, 255, 255, 0.1) !important;
+}
+
+:deep(.el-select-dropdown__popper .el-select-dropdown__item.is-hovering) {
+  background: rgba(0, 255, 255, 0.08) !important;
 }
 </style>

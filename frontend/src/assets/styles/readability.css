@@ -246,3 +246,83 @@ body .el-select-dropdown__item {
   font-size: var(--readable-md) !important;
   font-weight: var(--readable-weight-medium) !important;
 }
+
+/* Case module sort dropdowns are teleported to body by Element Plus. */
+.case-sort-select-popper.el-popper,
+.case-sort-select-popper.el-select__popper {
+  background: var(--bg-panel, #0d0d14) !important;
+  border: 1px solid var(--border-default, rgba(0, 255, 255, 0.2)) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.42), 0 0 18px rgba(0, 255, 255, 0.12) !important;
+  overflow: hidden;
+}
+
+.case-sort-select-popper .el-select-dropdown,
+.case-sort-select-popper .el-select-dropdown__wrap,
+.case-sort-select-popper .el-scrollbar,
+.case-sort-select-popper .el-scrollbar__view {
+  background: var(--bg-panel, #0d0d14) !important;
+}
+
+.case-sort-select-popper .el-select-dropdown__item {
+  height: 40px !important;
+  line-height: 40px !important;
+  padding: 0 18px !important;
+  background: transparent !important;
+  color: var(--text-secondary, #cbd5e1) !important;
+  font-size: var(--readable-md) !important;
+  font-weight: var(--readable-weight-medium) !important;
+}
+
+.case-sort-select-popper .el-select-dropdown__item:hover,
+.case-sort-select-popper .el-select-dropdown__item.is-hovering {
+  background: rgba(0, 255, 255, 0.1) !important;
+  color: var(--neon-cyan, #0ff) !important;
+}
+
+.case-sort-select-popper .el-select-dropdown__item.is-selected {
+  background: rgba(0, 255, 255, 0.16) !important;
+  color: var(--neon-cyan, #0ff) !important;
+  font-weight: 700 !important;
+}
+
+.case-sort-select-popper .el-popper__arrow,
+.case-sort-select-popper .el-popper__arrow::before {
+  background: var(--bg-panel, #0d0d14) !important;
+  border-color: var(--border-default, rgba(0, 255, 255, 0.2)) !important;
+}
+
+.theme-light .case-sort-select-popper.el-popper,
+.theme-light .case-sort-select-popper.el-select__popper {
+  background: #ffffff !important;
+  border-color: rgba(6, 182, 212, 0.24) !important;
+  box-shadow: 0 16px 44px rgba(15, 23, 42, 0.14), 0 0 18px rgba(6, 182, 212, 0.1) !important;
+}
+
+.theme-light .case-sort-select-popper .el-select-dropdown,
+.theme-light .case-sort-select-popper .el-select-dropdown__wrap,
+.theme-light .case-sort-select-popper .el-scrollbar,
+.theme-light .case-sort-select-popper .el-scrollbar__view {
+  background: #ffffff !important;
+}
+
+.theme-light .case-sort-select-popper .el-select-dropdown__item {
+  color: var(--text-secondary, #334155) !important;
+}
+
+.theme-light .case-sort-select-popper .el-select-dropdown__item:hover,
+.theme-light .case-sort-select-popper .el-select-dropdown__item.is-hovering {
+  background: rgba(6, 182, 212, 0.08) !important;
+  color: var(--modal-ai-accent, #0891b2) !important;
+}
+
+.theme-light .case-sort-select-popper .el-select-dropdown__item.is-selected {
+  background: rgba(6, 182, 212, 0.12) !important;
+  color: var(--modal-ai-accent, #0891b2) !important;
+}
+
+.theme-light .case-sort-select-popper .el-popper__arrow,
+.theme-light .case-sort-select-popper .el-popper__arrow::before {
+  background: #ffffff !important;
+  border-color: rgba(6, 182, 212, 0.24) !important;
+}

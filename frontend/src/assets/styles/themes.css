@@ -970,3 +970,49 @@ pre, code, .json-content {
     --el-form-label-font-color: var(--text-secondary, #888) !important;
   }
 }
+
+/* El-Select 深色主题适配 */
+.el-select-dropdown__popper {
+  --el-bg-color-overlay: var(--bg-panel, #0d0d14) !important;
+  --el-text-color-regular: var(--text-primary, #e0e0e0) !important;
+}
+
+.el-select-dropdown__popper .el-select-dropdown,
+.el-select-dropdown__popper .el-select-dropdown__wrap {
+  background: var(--bg-panel, #0d0d14) !important;
+  border: 1px solid var(--border-default, rgba(0, 255, 255, 0.2)) !important;
+}
+
+.el-select-dropdown__popper .el-select-dropdown__item {
+  background: transparent !important;
+  color: var(--text-primary, #e0e0e0) !important;
+}
+
+.el-select-dropdown__popper .el-select-dropdown__item:hover {
+  background: rgba(0, 255, 255, 0.1) !important;
+}
+
+.el-select-dropdown__popper .el-select-dropdown__item.is-hovering {
+  background: rgba(0, 255, 255, 0.08) !important;
+}
+
+.el-select-dropdown__popper .el-select-dropdown__item.is-selected {
+  color: var(--neon-cyan, #0ff) !important;
+  background: rgba(0, 255, 255, 0.15) !important;
+  font-weight: 600 !important;
+}
+
+.el-select-dropdown__popper .el-scrollbar__thumb {
+  background: rgba(0, 255, 255, 0.3) !important;
+}
+
+.el-select-dropdown__popper .el-scrollbar__thumb:hover {
+  background: rgba(0, 255, 255, 0.5) !important;
+}
+
+/* popper 箭头适配 */
+.el-select-dropdown__popper .el-popper__arrow,
+.el-select-dropdown__popper .el-popper__arrow::before {
+  background: var(--bg-panel, #0d0d14) !important;
+  border-color: var(--border-default, rgba(0, 255, 255, 0.2)) !important;
+}
