@@ -326,3 +326,84 @@ body .el-select-dropdown__item {
   background: #ffffff !important;
   border-color: rgba(6, 182, 212, 0.24) !important;
 }
+
+/* Folder cascaders are also teleported to body. */
+.folder-cascader-popper.el-popper,
+.folder-cascader-popper.el-cascader__dropdown {
+  z-index: 100200 !important;
+  background: var(--bg-panel, #0d0d14) !important;
+  border: 1px solid var(--border-default, rgba(0, 255, 255, 0.2)) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 20px 58px rgba(0, 0, 0, 0.48), 0 0 22px rgba(0, 255, 255, 0.16) !important;
+  overflow: hidden;
+}
+
+.folder-cascader-popper .el-cascader-panel,
+.folder-cascader-popper .el-cascader-menu,
+.folder-cascader-popper .el-scrollbar,
+.folder-cascader-popper .el-scrollbar__wrap,
+.folder-cascader-popper .el-scrollbar__view {
+  background: var(--bg-panel, #0d0d14) !important;
+  color: var(--text-primary, #e0e0e0) !important;
+}
+
+.folder-cascader-popper .el-cascader-menu {
+  border-right: 1px solid var(--border-default, rgba(0, 255, 255, 0.2)) !important;
+}
+
+.folder-cascader-popper .el-cascader-node {
+  min-height: 38px !important;
+  color: var(--text-secondary, #cbd5e1) !important;
+  font-size: var(--readable-md) !important;
+  font-weight: var(--readable-weight-medium) !important;
+}
+
+.folder-cascader-popper .el-cascader-node:hover,
+.folder-cascader-popper .el-cascader-node.in-active-path,
+.folder-cascader-popper .el-cascader-node.is-selectable.in-checked-path {
+  background: rgba(0, 255, 255, 0.1) !important;
+  color: var(--neon-cyan, #0ff) !important;
+}
+
+.folder-cascader-popper .el-cascader-node.is-disabled {
+  color: var(--text-muted, #64748b) !important;
+}
+
+.folder-cascader-popper .el-popper__arrow,
+.folder-cascader-popper .el-popper__arrow::before {
+  background: var(--bg-panel, #0d0d14) !important;
+  border-color: var(--border-default, rgba(0, 255, 255, 0.2)) !important;
+}
+
+.theme-light .folder-cascader-popper.el-popper,
+.theme-light .folder-cascader-popper.el-cascader__dropdown {
+  background: #ffffff !important;
+  border-color: rgba(6, 182, 212, 0.24) !important;
+  box-shadow: 0 20px 58px rgba(15, 23, 42, 0.16), 0 0 18px rgba(6, 182, 212, 0.1) !important;
+}
+
+.theme-light .folder-cascader-popper .el-cascader-panel,
+.theme-light .folder-cascader-popper .el-cascader-menu,
+.theme-light .folder-cascader-popper .el-scrollbar,
+.theme-light .folder-cascader-popper .el-scrollbar__wrap,
+.theme-light .folder-cascader-popper .el-scrollbar__view {
+  background: #ffffff !important;
+  color: var(--text-primary, #0f172a) !important;
+}
+
+.theme-light .folder-cascader-popper .el-cascader-node {
+  color: var(--text-secondary, #334155) !important;
+}
+
+.theme-light .folder-cascader-popper .el-cascader-node:hover,
+.theme-light .folder-cascader-popper .el-cascader-node.in-active-path,
+.theme-light .folder-cascader-popper .el-cascader-node.is-selectable.in-checked-path {
+  background: rgba(6, 182, 212, 0.08) !important;
+  color: var(--modal-ai-accent, #0891b2) !important;
+}
+
+.theme-light .folder-cascader-popper .el-popper__arrow,
+.theme-light .folder-cascader-popper .el-popper__arrow::before {
+  background: #ffffff !important;
+  border-color: rgba(6, 182, 212, 0.24) !important;
+}

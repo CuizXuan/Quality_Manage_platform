@@ -19,6 +19,7 @@ from app.services.request_executor import RequestExecutor
 from app.middleware.tenant_middleware import get_current_tenant_id
 
 router = APIRouter(prefix="/api/cases", tags=["Cases"])
+ROOT_FOLDER_PATH = "/根目录"
 
 
 def get_tenant_id(request: Request) -> int:
@@ -59,6 +60,7 @@ def create_case(
     db: Session = Depends(get_db),
     tenant_id: int = Depends(get_tenant_id),
 ):
+    folder_path = normalize_folder_path(data.folder_path)
     case = TestCase(
         tenant_id=tenant_id,
         name=data.name,
@@ -73,7 +75,7 @@ def create_case(
         response_body=data.response_body or "",
         auth_type=data.auth_type,
         auth_config=json.dumps(data.auth_config or {}),
-        folder_path=data.folder_path,
+        folder_path=folder_path,
         sort_order=data.sort_order,
         assertions=json.dumps([a.model_dump() for a in (data.assertions or [])]),
         pre_script=data.pre_script or "",
@@ -106,6 +108,8 @@ def update_case(case_id: int, data: TestCaseUpdate, db: Session = Depends(get_db
             continue
         if key in ("headers", "params", "auth_config", "assertions"):
             setattr(case, key, json.dumps(value) if value else "{}")
+        elif key == "folder_path":
+            setattr(case, key, normalize_folder_path(value))
         else:
             setattr(case, key, value)
     db.commit()
@@ -241,6 +245,12 @@ def _safe_json(value, default):
     """
     if not value:
         return default
+
+
+def normalize_folder_path(value: str | None) -> str:
+    if not value or value == "/":
+        return ROOT_FOLDER_PATH
+    return value
     try:
         parsed = json.loads(value)
         if isinstance(parsed, list):

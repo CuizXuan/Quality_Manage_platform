@@ -166,7 +166,16 @@
 
       <div class="form-group">
         <label class="form-label">所属分类</label>
-        <input v-model="form.folder_path" class="form-input" placeholder="/用户模块/登录" />
+        <el-cascader
+          v-model="form.folder_id"
+          :options="folderOptionsWithRoot"
+          :props="{ checkStrictly: true, label: 'label', value: 'id', emitPath: false }"
+          placeholder="请选择分类"
+          filterable
+          class="folder-cascader"
+          append-to-body
+          popper-class="folder-cascader-popper"
+        />
       </div>
 
       <div class="form-group">
@@ -202,6 +211,7 @@ import { storeToRefs } from 'pinia'
 import CaseFolderManager from '@/components/CaseFolderManager.vue'
 import CyberConfirm from '@/components/common/CyberConfirm.vue'
 import CyberModal from '@/components/common/modal/CyberModal.vue'
+import { getCaseFoldersFlat } from '@/api/caseFolders'
 
 const router = useRouter()
 
@@ -220,13 +230,43 @@ const editingCase = ref(null)
 const saving = ref(false)
 const form = ref(defaultForm())
 const formErrors = ref({ name: false, method: false, url: false })
+const folderOptions = ref([])
 
-watch(showCreateModal, (val) => {
+const folderOptionsWithRoot = computed(() => {
+  return folderOptions.value.map(folder => ({ ...folder, label: folder.name }))
+})
+
+const rootFolder = computed(() => {
+  return folderOptions.value.find(folder => folder.name === '根目录') || null
+})
+
+watch(showCreateModal, async (val) => {
   if (val) {
     formErrors.value = { name: false, method: false, url: false }
+    await loadFolderOptions()
   } else {
     editingCase.value = null
     form.value = defaultForm()
+  }
+})
+
+async function loadFolderOptions() {
+  try {
+    const res = await getCaseFoldersFlat()
+    folderOptions.value = res.data || []
+    if (!editingCase.value && form.value.folder_id == null) {
+      form.value.folder_id = rootFolder.value?.id ?? null
+    }
+  } catch {
+    folderOptions.value = []
+  }
+}
+
+watch(activeTab, (newTab) => {
+  if (newTab === 'cases') {
+    caseStore.fetchCases()
+  } else if (newTab === 'folders') {
+    caseStore.fetchFolders()
   }
 })
 
@@ -237,12 +277,19 @@ const deletingCaseId = ref(null)
 const cyberConfirmRefs = ref({})
 
 const folderList = computed(() => {
-  return folders.value.map(f => ({
-    name: f.name,
-    path: '/' + f.name,
-    count: cases.value.filter(c => c.folder_path === '/' + f.name).length
+  return flattenFolderTree(folders.value).map(folder => ({
+    name: folder.label,
+    path: '/' + folder.name,
+    count: cases.value.filter(c => c.folder_path === '/' + folder.name).length,
   }))
 })
+
+function flattenFolderTree(list, depth = 0) {
+  return list.flatMap(folder => [
+    { ...folder, label: `${'  '.repeat(depth)}${folder.name}` },
+    ...flattenFolderTree(folder.children || [], depth + 1),
+  ])
+}
 
 const filteredCases = computed(() => {
   let list = cases.value
@@ -261,7 +308,7 @@ function defaultForm() {
     name: '',
     method: 'GET',
     url: '',
-    folder_path: '/',
+    folder_id: null,
     description: '',
     headers: {},
     params: {},
@@ -331,11 +378,14 @@ async function saveCase() {
   }
   saving.value = true
   try {
+    const submitData = { ...form.value }
+    const folder = getFolderById(submitData.folder_id) || rootFolder.value
+    submitData.folder_path = folder ? '/' + folder.name : '/根目录'
     if (editingCase.value) {
-      await caseStore.updateCase(editingCase.value.id, form.value)
+      await caseStore.updateCase(editingCase.value.id, submitData)
       ElMessage.success('用例更新成功')
     } else {
-      await caseStore.createCase(form.value)
+      await caseStore.createCase(submitData)
       ElMessage.success('用例创建成功')
     }
     showCreateModal.value = false
@@ -348,10 +398,22 @@ async function saveCase() {
   }
 }
 
-function openCase(c) {
+async function openCase(c) {
   editingCase.value = c
+  await loadFolderOptions()
   form.value = { ...c }
+  form.value.folder_id = getFolderIdByPath(c.folder_path) ?? rootFolder.value?.id ?? null
   showCreateModal.value = true
+}
+
+function getFolderById(id) {
+  return folderOptions.value.find(folder => folder.id === id)
+}
+
+function getFolderIdByPath(path) {
+  if (!path || path === '/') return rootFolder.value?.id ?? null
+  const folderName = path.replace(/^\//, '')
+  return folderOptions.value.find(folder => folder.name === folderName)?.id ?? null
 }
 
 async function runCase(c) {
@@ -971,5 +1033,93 @@ onActivated(() => {
 
 :deep(.el-select-dropdown__popper .el-select-dropdown__item.is-hovering) {
   background: rgba(0, 255, 255, 0.08) !important;
+}
+
+/* 级联选择器深色主题样式 */
+.folder-cascader {
+  width: 100%;
+}
+
+:deep(.folder-cascader .el-input__wrapper) {
+  background: var(--bg-secondary, #0a0a0f) !important;
+  border-color: rgba(0, 255, 255, 0.22) !important;
+  box-shadow: none !important;
+}
+
+:deep(.folder-cascader .el-input__wrapper:hover) {
+  border-color: var(--neon-cyan, #0ff) !important;
+}
+
+:deep(.folder-cascader .el-input.is-focus .el-input__wrapper) {
+  border-color: var(--neon-cyan, #0ff) !important;
+  box-shadow: 0 0 0 2px rgba(0, 240, 255, 0.15) !important;
+}
+
+:deep(.folder-cascader .el-input__inner) {
+  color: var(--text-primary, #e0e0e0) !important;
+}
+
+:deep(.el-cascader-menu) {
+  background: var(--bg-panel, #0d0d14) !important;
+  border-color: var(--border-default, rgba(0, 255, 255, 0.2)) !important;
+  color: var(--text-primary, #e0e0e0) !important;
+}
+
+:deep(.el-cascader-menu__item) {
+  color: var(--text-primary, #e0e0e0) !important;
+}
+
+:deep(.el-cascader-menu__item:hover) {
+  background: rgba(0, 255, 255, 0.1) !important;
+}
+
+:deep(.el-cascader-menu__item.is-active) {
+  color: var(--neon-cyan, #0ff) !important;
+}
+
+:deep(.el-cascader-panel) {
+  background: var(--bg-panel, #0d0d14) !important;
+  border-color: var(--border-default, rgba(0, 255, 255, 0.2)) !important;
+}
+
+/* 级联选择器样式与其他输入框保持一致 */
+:deep(.folder-cascader) {
+  --el-input-bg-color: var(--bg-secondary, #0a0a0f);
+  --el-input-border-color: rgba(0, 255, 255, 0.22);
+  --el-input-border-hover-color: var(--neon-cyan, #0ff);
+  --el-input-text-color: var(--text-primary, #e0e0e0);
+}
+
+:deep(.folder-cascader .el-input__wrapper) {
+  background: var(--bg-secondary, #0a0a0f) !important;
+  border: 1px solid rgba(0, 255, 255, 0.22) !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+  padding: 0 12px !important;
+  min-height: 38px !important;
+}
+
+:deep(.folder-cascader .el-input__wrapper:hover) {
+  border-color: var(--neon-cyan, #0ff) !important;
+}
+
+:deep(.folder-cascader .el-input.is-focus .el-input__wrapper) {
+  border-color: var(--neon-cyan, #0ff) !important;
+  box-shadow: 0 0 0 2px rgba(0, 240, 255, 0.15) !important;
+}
+
+:deep(.folder-cascader .el-input__inner) {
+  color: var(--text-primary, #e0e0e0) !important;
+  font-family: var(--font-mono, 'Fira Code', monospace) !important;
+  font-size: 13px !important;
+}
+
+:deep(.folder-cascader .el-input__placeholder) {
+  color: var(--text-tertiary, #666) !important;
+}
+
+/* 级联选择器弹出层样式 - 解决被遮挡问题 */
+:deep(.cascader-popper-dark) {
+  z-index: 999999 !important;
 }
 </style>
